@@ -1,0 +1,50 @@
+components:
+  left_conduit:
+    type: conduit
+  right_conduit:
+    type: conduit
+  bornera:
+    type: 2x3
+  plug:
+    type: tipo_l
+  plug2:
+    type: tipo_l
+
+wires:
+  # Blue wires — channel A
+  - color: blue
+    from: left_conduit
+    to: bornera.a1
+  - color: blue
+    from: bornera.a2
+    to: right_conduit
+  - color: blue
+    from: bornera.a3
+    to: plug.neutral
+
+  # White wires — channel B
+  - color: white
+    from: left_conduit
+    to: bornera.b1
+  - color: white
+    from: bornera.b2
+    to: plug.live
+
+  # Green wires — direct
+  - color: green
+    from: left_conduit
+    to: plug.ground
+  - color: green
+    from: plug.ground
+    to: right_conduit
+
+  # plug2 — wired port-by-port from plug
+  - color: blue
+    from: plug.neutral
+    to: plug2.neutral
+  - color: white
+    from: plug.live
+    to: plug2.live
+  - color: green
+    from: plug.ground
+    to: plug2.ground

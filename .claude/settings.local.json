@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node cli.js examples/basic.wml)",
+      "Bash(open:*)"
+    ]
+  }
+}

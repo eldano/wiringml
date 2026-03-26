@@ -1,0 +1,13 @@
+{
+  "name": "wiringml",
+  "version": "0.1.0",
+  "description": "Declarative wiring diagram tool — text in, SVG out",
+  "main": "cli.js",
+  "scripts": {
+    "example": "node cli.js examples/basic.yaml > examples/basic.svg"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "js-yaml": "^4.1.1"
+  }
+}
