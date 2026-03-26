@@ -82,25 +82,45 @@ const COMPONENTS = {
   },
 
   tipo_l: {
-    width: 60,
+    // Rectangular plug face: 3:2 ratio (90×60).
+    // 3 decorative pin holes on the horizontal centre axis (left=live, centre=ground, right=neutral).
+    // Each pin has a connection point on both the top and bottom edge.
+    // Ports: live.t/b, ground.t/b, neutral.t/b  (t=top, b=bottom — electrically equivalent pairs).
+    width: 90,
     height: 60,
     ports() {
       return {
-        ground:  { x: 30, y: 5  },
-        live:    { x: 5,  y: 55 },
-        neutral: { x: 55, y: 55 },
-        center:  { x: 30, y: 40 },
+        'live.t':    { x: 22, y: 0  },
+        'live.b':    { x: 22, y: 60 },
+        'ground.t':  { x: 45, y: 0  },
+        'ground.b':  { x: 45, y: 60 },
+        'neutral.t': { x: 68, y: 0  },
+        'neutral.b': { x: 68, y: 60 },
+        center:      { x: 45, y: 30 },
       };
     },
     svg(x, y, _props, id) {
-      const pts = `${x + 30},${y + 5} ${x + 5},${y + 55} ${x + 55},${y + 55}`;
+      const pinXs = [22, 45, 68];
+
+      const holes = pinXs.map(ox =>
+        `  <circle cx="${x + ox}" cy="${y + 30}" r="7" fill="#444" stroke="#222" stroke-width="1"/>`
+      ).join('\n');
+
+      // Small terminal markers on top and bottom edges
+      const topPins = pinXs.map(ox =>
+        `  <circle cx="${x + ox}" cy="${y}"      r="3" fill="#888" stroke="#555" stroke-width="1"/>`
+      ).join('\n');
+      const botPins = pinXs.map(ox =>
+        `  <circle cx="${x + ox}" cy="${y + 60}" r="3" fill="#888" stroke="#555" stroke-width="1"/>`
+      ).join('\n');
+
       return [
         `<g class="component tipo_l">`,
-        `  <polygon points="${pts}" fill="#42A5F5" stroke="#1565C0" stroke-width="1.5"/>`,
-        `  <circle cx="${x + 30}" cy="${y + 5}"  r="4" fill="#FFF" stroke="#333" stroke-width="1"/>`,
-        `  <circle cx="${x + 5}"  cy="${y + 55}" r="4" fill="#FFF" stroke="#333" stroke-width="1"/>`,
-        `  <circle cx="${x + 55}" cy="${y + 55}" r="4" fill="#FFF" stroke="#333" stroke-width="1"/>`,
-        `  <text x="${x + 30}" y="${y + 40}" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#FFF">${id}</text>`,
+        `  <rect x="${x}" y="${y}" width="90" height="60" fill="#F0EDE8" stroke="#444" stroke-width="1.5" rx="3"/>`,
+        holes,
+        topPins,
+        botPins,
+        `  <text x="${x + 45}" y="${y + 74}" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#444">${id}</text>`,
         `</g>`,
       ].join('\n');
     },

@@ -29,35 +29,24 @@ async function main() {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title}</title>
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 24px;
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
       background: #E8E8E8;
-      font-family: sans-serif;
+      overflow: hidden;
     }
-    h1 {
-      margin: 0 0 16px;
-      font-size: 14px;
-      color: #555;
-      font-weight: normal;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-    .diagram {
-      display: inline-block;
-      background: #F5F5F5;
-      border: 1px solid #CCC;
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      padding: 16px;
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
 <body>
-  <h1>${title}</h1>
-  <div class="diagram">
-    ${svg}
-  </div>
+  ${svg}
 </body>
 </html>`;
 

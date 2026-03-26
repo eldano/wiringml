@@ -31,7 +31,9 @@ function parse(source) {
     to:    parseEndpoint(String(wire.to)),
   }));
 
-  return { components, wires };
+  const casing = doc.casing || null;
+
+  return { components, wires, casing };
 }
 
 function parseEndpoint(str) {

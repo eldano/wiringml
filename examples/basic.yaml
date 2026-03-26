@@ -1,50 +1,62 @@
+casing:
+  conduits:
+    conduit_1: {wall: top, position: left}
+    conduit_2: {wall: top, position: right}
+  modules:
+    - tipo_l
+    - closed
+    - tipo_l
+
 components:
-  left_conduit:
+  conduit_1:
     type: conduit
-  right_conduit:
+  conduit_2:
     type: conduit
   bornera:
     type: 2x3
-  plug:
+  plug_top:
     type: tipo_l
-  plug2:
+  plug_bottom:
     type: tipo_l
 
 wires:
   # Blue wires — channel A
   - color: blue
-    from: left_conduit
+    from: conduit_1
     to: bornera.a1
   - color: blue
     from: bornera.a2
-    to: right_conduit
+    to: conduit_2
   - color: blue
     from: bornera.a3
-    to: plug.neutral
+    to: plug_top.neutral.b
 
   # White wires — channel B
   - color: white
-    from: left_conduit
+    from: conduit_1
     to: bornera.b1
   - color: white
     from: bornera.b2
-    to: plug.live
+    to: conduit_2
+  - color: white
+    from: bornera.b3
+    to: plug_top.live.b
 
   # Green wires — direct
   - color: green
-    from: left_conduit
-    to: plug.ground
+    from: conduit_1
+    to: plug_top.ground.b
   - color: green
-    from: plug.ground
-    to: right_conduit
+    from: plug_bottom.ground.t
+    to: conduit_2
 
-  # plug2 — wired port-by-port from plug
+  # plug_bottom — wired port-by-port from plug_top (exits top, enters bottom)
   - color: blue
-    from: plug.neutral
-    to: plug2.neutral
+    from: plug_top.neutral.t
+    to: plug_bottom.neutral.b
   - color: white
-    from: plug.live
-    to: plug2.live
+    from: plug_top.live.t
+    to: plug_bottom.live.b
   - color: green
-    from: plug.ground
-    to: plug2.ground
+    from: plug_top.ground.t
+    to: plug_bottom.ground.b
