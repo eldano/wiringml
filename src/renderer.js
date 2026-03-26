@@ -3,12 +3,13 @@
 const { WIRE_COLORS, getComponentDef } = require('./components');
 
 /**
- * Render a graph + layout positions to an SVG string.
+ * Render a graph and elkjs layout result to an SVG string.
+ * layoutResult: { positions: { [id]: { x, y, width, height } }, edges: [{ wire, sections }] }
  */
-function render(graph, positions) {
-  const { components, wires } = graph;
+function render(graph, { positions, edges }) {
+  const { components } = graph;
 
-  // Canvas dimensions
+  // Canvas dimensions from node extents
   let maxX = 0, maxY = 0;
   for (const pos of Object.values(positions)) {
     if (pos.x + pos.width  > maxX) maxX = pos.x + pos.width;
@@ -17,18 +18,22 @@ function render(graph, positions) {
   const W = maxX + 60;
   const H = maxY + 60;
 
-  const compById = Object.fromEntries(components.map(c => [c.id, c]));
-
-  // Wires drawn first (under components)
-  const wireSVG = wires.map(wire => {
-    const p1    = resolvePort(wire.from, compById, positions);
-    const p2    = resolvePort(wire.to,   compById, positions);
+  // Wires — use ELK-routed sections (absolute coordinates, overlap-free)
+  const wireSVG = edges.map(({ wire, sections }) => {
+    if (!sections.length) return '';
     const color = WIRE_COLORS[wire.color] || wire.color;
-    const d     = manhattanPath(p1.x, p1.y, p2.x, p2.y);
-    return `  <path d="${d}" stroke="${color}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    return sections.map(section => {
+      const points = [
+        section.startPoint,
+        ...(section.bendPoints || []),
+        section.endPoint,
+      ];
+      const d = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+      return `  <path d="${d}" stroke="${color}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    }).join('\n');
   }).join('\n');
 
-  // Components drawn on top
+  // Components
   const compSVG = components.map(comp => {
     const pos = positions[comp.id];
     if (!pos) return '';
@@ -47,34 +52,6 @@ function render(graph, positions) {
     `  </g>`,
     `</svg>`,
   ].join('\n');
-}
-
-/**
- * Resolve an endpoint { id, port } to an absolute { x, y } on the canvas.
- * Falls back to component center if the port name is unknown.
- */
-function resolvePort(endpoint, compById, positions) {
-  const comp = compById[endpoint.id];
-  const pos  = positions[endpoint.id];
-  if (!comp || !pos) return { x: 0, y: 0 };
-
-  const def   = getComponentDef(comp.type);
-  const ports = def.ports(comp.props);
-
-  const rel = (endpoint.port && ports[endpoint.port])
-    ? ports[endpoint.port]
-    : (ports.center || { x: pos.width / 2, y: pos.height / 2 });
-
-  return { x: pos.x + rel.x, y: pos.y + rel.y };
-}
-
-/**
- * Orthogonal (Manhattan) path: horizontal → vertical → horizontal.
- * Keeps wires axis-aligned, avoids diagonals.
- */
-function manhattanPath(x1, y1, x2, y2) {
-  const mx = Math.round((x1 + x2) / 2);
-  return `M ${x1} ${y1} L ${mx} ${y1} L ${mx} ${y2} L ${x2} ${y2}`;
 }
 
 module.exports = { render };

@@ -1,80 +1,88 @@
 'use strict';
 
-const { getComponentWidth, getComponentHeight } = require('./components');
+const ELK = require('elkjs/lib/elk.bundled.js');
+const { getComponentDef, getComponentWidth, getComponentHeight } = require('./components');
 
-const H_GAP  = 80;  // horizontal gap between layers
-const V_GAP  = 60;  // vertical gap between nodes in the same layer
-const MARGIN = 50;  // canvas margin
+const elk = new ELK();
 
 /**
- * Compute x/y positions for all components using a simple layered layout.
- * Layer assignment: longest-path from any source node (iterative relaxation).
- * Within each layer, components are stacked top-to-bottom.
- *
- * Returns { [id]: { x, y, width, height } }
+ * Lay out the graph using elkjs.
+ * Returns { positions: { [id]: { x, y, width, height } }, edges: [{ wire, sections }] }
+ * where sections are ELK edge route sections with absolute coordinates.
  */
-function layout(graph) {
+async function layout(graph) {
   const { components, wires } = graph;
-  if (components.length === 0) return {};
+  if (components.length === 0) return { positions: {}, edges: [] };
 
-  // Deduplicate directed edges (for layout purposes only)
-  const edgeSet = new Set();
-  const edges   = [];
-  for (const wire of wires) {
-    const { id: from } = wire.from;
-    const { id: to }   = wire.to;
-    if (from === to) continue;
-    const key = `${from}\x00${to}`;
-    if (!edgeSet.has(key)) {
-      edgeSet.add(key);
-      edges.push({ from, to });
-    }
-  }
+  const elkGraph = {
+    id: 'root',
+    layoutOptions: {
+      'elk.algorithm': 'layered',
+      'elk.direction': 'RIGHT',
+      'elk.layered.spacing.nodeNodeBetweenLayers': '80',
+      'elk.spacing.nodeNode': '60',
+      'elk.edgeRouting': 'ORTHOGONAL',
+      'elk.padding': '[top=50, left=50, bottom=50, right=50]',
+      'elk.layered.unnecessaryBendpoints': 'true',
+    },
+    children: components.map(comp => {
+      const def   = getComponentDef(comp.type);
+      const w     = getComponentWidth(comp);
+      const h     = getComponentHeight(comp);
+      const portDefs = def.ports(comp.props);
 
-  // Longest-path layer assignment (iterative relaxation — handles DAGs correctly)
-  const layer = {};
-  for (const c of components) layer[c.id] = 0;
+      // Expose all named ports to ELK except 'center' (interior — not a boundary port)
+      const ports = Object.entries(portDefs)
+        .filter(([name]) => name !== 'center')
+        .map(([name, pos]) => ({
+          id:     `${comp.id}.${name}`,
+          x:      pos.x,
+          y:      pos.y,
+          width:  1,
+          height: 1,
+        }));
 
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const { from, to } of edges) {
-      const candidate = (layer[from] ?? 0) + 1;
-      if (candidate > (layer[to] ?? 0)) {
-        layer[to] = candidate;
-        changed = true;
-      }
-    }
-  }
+      return {
+        id: comp.id,
+        width: w,
+        height: h,
+        ports,
+        layoutOptions: ports.length > 0
+          ? { 'elk.portConstraints': 'FIXED_POS' }
+          : {},
+      };
+    }),
+    edges: wires.map((wire, i) => ({
+      id:      `e${i}`,
+      sources: [wire.from.port ? `${wire.from.id}.${wire.from.port}` : wire.from.id],
+      targets: [wire.to.port   ? `${wire.to.id}.${wire.to.port}`     : wire.to.id],
+    })),
+  };
 
-  // Group by layer
-  const byLayer = {};
-  for (const c of components) {
-    const l = layer[c.id] ?? 0;
-    (byLayer[l] = byLayer[l] || []).push(c);
-  }
+  const result = await elk.layout(elkGraph);
 
-  // Assign pixel positions
+  // Node positions (ELK returns absolute x/y)
   const positions = {};
-  let x = MARGIN;
-
-  for (const l of Object.keys(byLayer).sort((a, b) => Number(a) - Number(b))) {
-    const comps  = byLayer[l];
-    let y        = MARGIN;
-    let maxWidth = 0;
-
-    for (const comp of comps) {
-      const w = getComponentWidth(comp);
-      const h = getComponentHeight(comp);
-      positions[comp.id] = { x, y, width: w, height: h };
-      y += h + V_GAP;
-      if (w > maxWidth) maxWidth = w;
-    }
-
-    x += maxWidth + H_GAP;
+  for (const node of result.children || []) {
+    const comp = components.find(c => c.id === node.id);
+    positions[node.id] = {
+      x:      node.x,
+      y:      node.y,
+      width:  getComponentWidth(comp),
+      height: getComponentHeight(comp),
+    };
   }
 
-  return positions;
+  // Edge routes — map back to original wires by id
+  const edgeById = {};
+  for (const edge of result.edges || []) edgeById[edge.id] = edge;
+
+  const edges = wires.map((wire, i) => ({
+    wire,
+    sections: (edgeById[`e${i}`] || {}).sections || [],
+  }));
+
+  return { positions, edges };
 }
 
 module.exports = { layout };
