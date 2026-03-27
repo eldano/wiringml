@@ -184,68 +184,7 @@ async function layout(graph) {
     sections: (edgeById[`e${i}`] || {}).sections || [],
   }));
 
-  // Snap conduit positions to reflect their physical wall placement
-  if (casing?.conduits) {
-    snapConduitPositions(casing.conduits, positions, edges);
-  }
-
   return { positions, edges };
-}
-
-/**
- * After ELK runs, override conduit y-positions to match their casing wall:
- *   top    → align with topmost component in the diagram
- *   bottom → align with bottommost component
- *   left/right/back → interpolate by position fraction between top and bottom
- *
- * Also patches the first/last bend-point of every edge touching a moved conduit
- * so that orthogonal wire paths stay valid after the shift.
- */
-function snapConduitPositions(casingConduits, positions, edges) {
-  const allYs = Object.values(positions).flatMap(p => [p.y, p.y + p.height]);
-  const yMin  = Math.min(...allYs);
-  const yMax  = Math.max(...allYs);
-
-  const FRAC = { left: 0, top: 0, center: 0.5, right: 1, bottom: 1 };
-
-  for (const [id, def] of Object.entries(casingConduits)) {
-    const pos = positions[id];
-    if (!pos) continue;
-
-    const wall     = def.wall     || 'back';
-    const position = def.position || 'center';
-
-    let targetY;
-    if (wall === 'top') {
-      targetY = yMin;
-    } else if (wall === 'bottom') {
-      targetY = yMax - pos.height;
-    } else {
-      const f = FRAC[position] ?? 0.5;
-      targetY = yMin + (yMax - yMin - pos.height) * f;
-    }
-
-    const dy = targetY - pos.y;
-    if (Math.abs(dy) < 0.5) continue;
-
-    pos.y = targetY;
-
-    for (const { wire, sections } of edges) {
-      if (!sections.length) continue;
-      for (const section of sections) {
-        if (wire.from.id === id) {
-          section.startPoint.y += dy;
-          if (section.bendPoints?.length) section.bendPoints[0].y += dy;
-        }
-        if (wire.to.id === id) {
-          section.endPoint.y += dy;
-          if (section.bendPoints?.length) {
-            section.bendPoints[section.bendPoints.length - 1].y += dy;
-          }
-        }
-      }
-    }
-  }
 }
 
 module.exports = { layout };
