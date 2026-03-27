@@ -4,6 +4,7 @@
   "description": "Declarative wiring diagram tool — text in, SVG out",
   "main": "cli.js",
   "scripts": {
+    "serve": "node serve.js",
     "example": "node cli.js examples/basic.yaml > examples/basic.html"
   },
   "license": "MIT",

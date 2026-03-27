@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WiringML</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 24px;
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      background: #E8E8E8;
+      overflow: hidden;
+    }
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #error {
+      font-family: monospace;
+      font-size: 13px;
+      color: #C62828;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <script src="/node_modules/js-yaml/dist/js-yaml.min.js"></script>
+  <script src="/node_modules/elkjs/lib/elk.bundled.js"></script>
+  <script>
+  'use strict';
+
+  // ── components ────────────────────────────────────────────────────────────
+
+  const WIRE_COLORS = {
+    blue:   '#1565C0',
+    white:  '#BDBDBD',
+    green:  '#2E7D32',
+    red:    '#C62828',
+    black:  '#212121',
+    yellow: '#F9A825',
+    orange: '#E65100',
+    brown:  '#4E342E',
+    gray:   '#757575',
+    grey:   '#757575',
+  };
+
+  const COMPONENTS = {
+
+    conduit: {
+      width: 60,
+      height: 40,
+      ports() {
+        return {
+          center: { x: 30, y: 20 },
+          left:   { x: 0,  y: 20 },
+          right:  { x: 60, y: 20 },
+          top:    { x: 30, y: 0  },
+          bottom: { x: 30, y: 40 },
+        };
+      },
+      svg(x, y, _props, id) {
+        return [
+          `<g class="component conduit">`,
+          `  <rect x="${x}" y="${y}" width="60" height="40" fill="#FF8C00" stroke="#444" stroke-width="1.5" rx="3"/>`,
+          `  <text x="${x + 30}" y="${y + 25}" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#222">${id}</text>`,
+          `</g>`,
+        ].join('\n');
+      },
+    },
+
+    terminal_block: {
+      width(props) { return Math.max(80, (props.ports || 2) * 25); },
+      height: 50,
+      ports(props) {
+        const n = props.ports || 2;
+        const w = Math.max(80, n * 25);
+        const step = w / (n + 1);
+        const result = {};
+        for (let i = 1; i <= n; i++) {
+          result[`top_${i}`] = { x: Math.round(step * i), y: 0  };
+          result[`bot_${i}`] = { x: Math.round(step * i), y: 50 };
+        }
+        result.top_left  = result['top_1'];
+        result.top_right = result[`top_${n}`];
+        result.bot_left  = result['bot_1'];
+        result.bot_right = result[`bot_${n}`];
+        result.center    = { x: Math.round(w / 2), y: 25 };
+        return result;
+      },
+      svg(x, y, props, id) {
+        const n = props.ports || 2;
+        const w = Math.max(80, n * 25);
+        const step = w / (n + 1);
+        const pins = Array.from({ length: n }, (_, i) => {
+          const px = x + step * (i + 1);
+          return `  <rect x="${px - 4}" y="${y + 12}" width="8" height="26" fill="#888" stroke="#555" stroke-width="1" rx="1"/>`;
+        }).join('\n');
+        return [
+          `<g class="component terminal_block">`,
+          `  <rect x="${x}" y="${y}" width="${w}" height="50" fill="#ECEFF1" stroke="#444" stroke-width="1.5" rx="2"/>`,
+          pins,
+          `  <text x="${x + w / 2}" y="${y + 46}" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#444">${id}</text>`,
+          `</g>`,
+        ].join('\n');
+      },
+    },
+
+    tipo_l: {
+      width: 90,
+      height: 60,
+      ports() {
+        return {
+          'live.t':    { x: 22, y: 0  },
+          'live.b':    { x: 22, y: 60 },
+          'ground.t':  { x: 45, y: 0  },
+          'ground.b':  { x: 45, y: 60 },
+          'neutral.t': { x: 68, y: 0  },
+          'neutral.b': { x: 68, y: 60 },
+          center:      { x: 45, y: 30 },
+        };
+      },
+      svg(x, y, _props, id) {
+        const pinXs = [22, 45, 68];
+        const holes = pinXs.map(ox =>
+          `  <circle cx="${x + ox}" cy="${y + 30}" r="7" fill="#444" stroke="#222" stroke-width="1"/>`
+        ).join('\n');
+        const topPins = pinXs.map(ox =>
+          `  <circle cx="${x + ox}" cy="${y}"      r="3" fill="#888" stroke="#555" stroke-width="1"/>`
+        ).join('\n');
+        const botPins = pinXs.map(ox =>
+          `  <circle cx="${x + ox}" cy="${y + 60}" r="3" fill="#888" stroke="#555" stroke-width="1"/>`
+        ).join('\n');
+        return [
+          `<g class="component tipo_l">`,
+          `  <rect x="${x}" y="${y}" width="90" height="60" fill="#F0EDE8" stroke="#444" stroke-width="1.5" rx="3"/>`,
+          holes,
+          topPins,
+          botPins,
+          `  <text x="${x + 45}" y="${y + 74}" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#444">${id}</text>`,
+          `</g>`,
+        ].join('\n');
+      },
+    },
+
+    enclosure: {
+      width: 160,
+      height: 110,
+      ports() {
+        return {
+          center: { x: 80,  y: 55  },
+          left:   { x: 0,   y: 55  },
+          right:  { x: 160, y: 55  },
+          top:    { x: 80,  y: 0   },
+          bottom: { x: 80,  y: 110 },
+        };
+      },
+      svg(x, y, _props, id) {
+        return [
+          `<g class="component enclosure">`,
+          `  <rect x="${x}" y="${y}" width="160" height="110" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="8,4" rx="5"/>`,
+          `  <text x="${x + 10}" y="${y + 16}" font-family="sans-serif" font-size="10" fill="#777">${id}</text>`,
+          `</g>`,
+        ].join('\n');
+      },
+    },
+
+    '2x3': {
+      width: 160,
+      height: 55,
+      ports() {
+        return {
+          a1: { x: 18, y: 0 }, a2: { x: 40, y: 0 }, a3: { x: 62, y: 0 },
+          b1: { x: 98, y: 0 }, b2: { x: 120, y: 0 }, b3: { x: 142, y: 0 },
+          center: { x: 80, y: 27 },
+        };
+      },
+      svg(x, y, _props, id) {
+        const screws = (offsets) => offsets.map(ox =>
+          `<circle cx="${x + ox}" cy="${y + 14}" r="5" fill="#AAA" stroke="#555" stroke-width="1"/>` +
+          `<line x1="${x + ox - 3}" y1="${y + 14}" x2="${x + ox + 3}" y2="${y + 14}" stroke="#555" stroke-width="1"/>`
+        ).join('\n');
+        return [
+          `<g class="component 2x3">`,
+          `  <rect x="${x}" y="${y}" width="160" height="55" fill="#ECEFF1" stroke="#444" stroke-width="1.5" rx="2"/>`,
+          `  <line x1="${x + 80}" y1="${y}" x2="${x + 80}" y2="${y + 55}" stroke="#AAA" stroke-width="1" stroke-dasharray="3,2"/>`,
+          `  <text x="${x + 40}" y="${y + 48}" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#666">A</text>`,
+          `  <text x="${x + 120}" y="${y + 48}" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#666">B</text>`,
+          screws([18, 40, 62]),
+          screws([98, 120, 142]),
+          `  <text x="${x + 80}" y="${y + 48}" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#888">${id}</text>`,
+          `</g>`,
+        ].join('\n');
+      },
+    },
+
+    _unknown: {
+      width: 60,
+      height: 40,
+      ports() { return { center: { x: 30, y: 20 } }; },
+      svg(x, y, _props, id) {
+        return [
+          `<g class="component unknown">`,
+          `  <rect x="${x}" y="${y}" width="60" height="40" fill="#EEE" stroke="#999" stroke-width="1" rx="3"/>`,
+          `  <text x="${x + 30}" y="${y + 25}" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#666">${id}</text>`,
+          `</g>`,
+        ].join('\n');
+      },
+    },
+
+  };
+
+  function getComponentDef(type) {
+    return COMPONENTS[type] || COMPONENTS._unknown;
+  }
+
+  function getComponentWidth(comp) {
+    const def = getComponentDef(comp.type);
+    return typeof def.width === 'function' ? def.width(comp.props) : def.width;
+  }
+
+  function getComponentHeight(comp) {
+    const def = getComponentDef(comp.type);
+    return typeof def.height === 'function' ? def.height(comp.props) : def.height;
+  }
+
+  // ── parser ────────────────────────────────────────────────────────────────
+
+  function parse(source) {
+    const doc = jsyaml.load(source);
+    const components = Object.entries(doc.components || {}).map(([id, def]) => {
+      const { type, ...props } = def;
+      return { id, type, props };
+    });
+    const wires = (doc.wires || []).map(wire => ({
+      color: wire.color,
+      from:  parseEndpoint(String(wire.from)),
+      to:    parseEndpoint(String(wire.to)),
+    }));
+    const casing = doc.casing || null;
+    return { components, wires, casing };
+  }
+
+  function parseEndpoint(str) {
+    const dot = str.indexOf('.');
+    if (dot === -1) return { id: str, port: null };
+    return { id: str.slice(0, dot), port: str.slice(dot + 1) };
+  }
+
+  // ── layout ────────────────────────────────────────────────────────────────
+
+  function wallExitSide(wall) {
+    switch (wall) {
+      case 'top':    return 'bottom';
+      case 'bottom': return 'top';
+      case 'left':   return 'right';
+      case 'right':  return 'left';
+      default:       return null;
+    }
+  }
+
+  function sideCoord(side, n, step, w, h) {
+    switch (side) {
+      case 'left':   return { x: 0, y: Math.round(step * n) };
+      case 'right':  return { x: w, y: Math.round(step * n) };
+      case 'top':    return { x: Math.round(step * n), y: 0 };
+      case 'bottom': return { x: Math.round(step * n), y: h };
+      default:       return { x: w / 2, y: h / 2 };
+    }
+  }
+
+  function assignAutoPorts(components, wires, casing) {
+    const compById       = Object.fromEntries(components.map(c => [c.id, c]));
+    const casingConduits = casing?.conduits || {};
+
+    const resolvedWires = wires.map(w => ({
+      ...w, from: { ...w.from }, to: { ...w.to },
+    }));
+
+    function portSide(nodeId, isIncoming) {
+      const exitSide = wallExitSide(casingConduits[nodeId]?.wall);
+      return exitSide ?? (isIncoming ? 'left' : 'right');
+    }
+
+    const groups = {};
+
+    for (let i = 0; i < resolvedWires.length; i++) {
+      const { from, to } = resolvedWires[i];
+
+      if (!to.port) {
+        const side = portSide(to.id, true);
+        const key  = `${to.id}:${side}`;
+        if (!groups[key]) groups[key] = { nodeId: to.id, side, items: [] };
+        groups[key].items.push({ wi: i, endpoint: 'to' });
+      }
+      if (!from.port) {
+        const side = portSide(from.id, false);
+        const key  = `${from.id}:${side}`;
+        if (!groups[key]) groups[key] = { nodeId: from.id, side, items: [] };
+        groups[key].items.push({ wi: i, endpoint: 'from' });
+      }
+    }
+
+    const extraPorts = {};
+
+    for (const { nodeId, side, items } of Object.values(groups)) {
+      const isWallAware = wallExitSide(casingConduits[nodeId]?.wall) !== null;
+
+      if (items.length <= 1 && !isWallAware) continue;
+
+      const comp = compById[nodeId];
+      if (!comp) continue;
+
+      const w       = getComponentWidth(comp);
+      const h       = getComponentHeight(comp);
+      const isHoriz = side === 'top' || side === 'bottom';
+      const step    = (isHoriz ? w : h) / (items.length + 1);
+
+      extraPorts[nodeId] = extraPorts[nodeId] || [];
+
+      items.forEach(({ wi, endpoint }, idx) => {
+        const portName     = `__auto_${side}_${idx}`;
+        const { x, y }     = sideCoord(side, idx + 1, step, w, h);
+        extraPorts[nodeId].push({ id: `${nodeId}.${portName}`, x, y });
+
+        if (endpoint === 'to') {
+          resolvedWires[wi].to   = { id: nodeId, port: portName };
+        } else {
+          resolvedWires[wi].from = { id: nodeId, port: portName };
+        }
+      });
+    }
+
+    return { resolvedWires, extraPorts };
+  }
+
+  async function layout(graph) {
+    const { components, wires, casing } = graph;
+    if (components.length === 0) return { positions: {}, edges: [] };
+
+    const { resolvedWires, extraPorts } = assignAutoPorts(components, wires, casing);
+
+    const elk = new ELK();
+
+    const elkGraph = {
+      id: 'root',
+      layoutOptions: {
+        'elk.algorithm': 'layered',
+        'elk.direction': 'RIGHT',
+        'elk.layered.spacing.nodeNodeBetweenLayers': '80',
+        'elk.spacing.nodeNode': '60',
+        'elk.edgeRouting': 'ORTHOGONAL',
+        'elk.padding': '[top=50, left=50, bottom=50, right=50]',
+        'elk.layered.unnecessaryBendpoints': 'true',
+      },
+      children: components.map(comp => {
+        const def      = getComponentDef(comp.type);
+        const w        = getComponentWidth(comp);
+        const h        = getComponentHeight(comp);
+        const portDefs = def.ports(comp.props);
+
+        const namedPorts = Object.entries(portDefs)
+          .filter(([name]) => name !== 'center')
+          .map(([name, pos]) => ({
+            id: `${comp.id}.${name}`, x: pos.x, y: pos.y, width: 1, height: 1,
+          }));
+
+        const autoPorts = (extraPorts[comp.id] || []).map(p => ({
+          id: p.id, x: p.x, y: p.y, width: 1, height: 1,
+        }));
+
+        const ports = [...namedPorts, ...autoPorts];
+
+        return {
+          id: comp.id,
+          width: w,
+          height: h,
+          ports,
+          layoutOptions: ports.length > 0
+            ? { 'elk.portConstraints': 'FIXED_POS' }
+            : {},
+        };
+      }),
+      edges: resolvedWires.map((wire, i) => ({
+        id:      `e${i}`,
+        sources: [wire.from.port ? `${wire.from.id}.${wire.from.port}` : wire.from.id],
+        targets: [wire.to.port   ? `${wire.to.id}.${wire.to.port}`     : wire.to.id],
+      })),
+    };
+
+    const result = await elk.layout(elkGraph);
+
+    const positions = {};
+    for (const node of result.children || []) {
+      const comp = components.find(c => c.id === node.id);
+      positions[node.id] = {
+        x:      node.x,
+        y:      node.y,
+        width:  getComponentWidth(comp),
+        height: getComponentHeight(comp),
+      };
+    }
+
+    const edgeById = {};
+    for (const edge of result.edges || []) edgeById[edge.id] = edge;
+
+    const edges = wires.map((wire, i) => ({
+      wire,
+      sections: (edgeById[`e${i}`] || {}).sections || [],
+    }));
+
+    if (casing?.conduits) {
+      snapConduitPositions(casing.conduits, positions, edges);
+    }
+
+    return { positions, edges };
+  }
+
+  function snapConduitPositions(casingConduits, positions, edges) {
+    const allYs = Object.values(positions).flatMap(p => [p.y, p.y + p.height]);
+    const yMin  = Math.min(...allYs);
+    const yMax  = Math.max(...allYs);
+
+    const FRAC = { left: 0, top: 0, center: 0.5, right: 1, bottom: 1 };
+
+    for (const [id, def] of Object.entries(casingConduits)) {
+      const pos = positions[id];
+      if (!pos) continue;
+
+      const wall     = def.wall     || 'back';
+      const position = def.position || 'center';
+
+      let targetY;
+      if (wall === 'top') {
+        targetY = yMin;
+      } else if (wall === 'bottom') {
+        targetY = yMax - pos.height;
+      } else {
+        const f = FRAC[position] ?? 0.5;
+        targetY = yMin + (yMax - yMin - pos.height) * f;
+      }
+
+      const dy = targetY - pos.y;
+      if (Math.abs(dy) < 0.5) continue;
+
+      pos.y = targetY;
+
+      for (const { wire, sections } of edges) {
+        if (!sections.length) continue;
+        for (const section of sections) {
+          if (wire.from.id === id) {
+            section.startPoint.y += dy;
+            if (section.bendPoints?.length) section.bendPoints[0].y += dy;
+          }
+          if (wire.to.id === id) {
+            section.endPoint.y += dy;
+            if (section.bendPoints?.length) {
+              section.bendPoints[section.bendPoints.length - 1].y += dy;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ── renderer ──────────────────────────────────────────────────────────────
+
+  const MARGIN        = 30;
+  const MARKER_R      = 8;
+  const PANEL_GAP     = 70;
+  const PANEL_W_DEF   = 120;
+  const PANEL_H_DEF   = 140;
+  const MOD_W   = 80;
+  const MOD_H   = 28;
+  const MOD_GAP = 10;
+
+  const H_FRAC = { left: 0.2, center: 0.5, right: 0.8 };
+  const V_FRAC = { top:  0.2, center: 0.5, bottom: 0.8 };
+
+  function render(graph, { positions, edges }) {
+    const { components, casing } = graph;
+
+    let panelResult = null;
+    let xOffset     = 0;
+
+    if (casing && Object.keys(casing.conduits || {}).length > 0) {
+      panelResult = buildPanel(casing);
+      xOffset     = panelResult.panelRight + PANEL_GAP;
+    }
+
+    let wiringMaxX = 0, wiringMaxY = 0;
+    for (const pos of Object.values(positions)) {
+      if (pos.x + pos.width  > wiringMaxX) wiringMaxX = pos.x + pos.width;
+      if (pos.y + pos.height > wiringMaxY) wiringMaxY = pos.y + pos.height;
+    }
+
+    let rightPanelResult = null;
+    if (casing?.modules?.length) {
+      const rpX = MARGIN;
+      const rpY = (panelResult ? panelResult.panelBottom : MARGIN) + 20;
+      rightPanelResult = buildRightPanel(casing.modules, rpX, rpY, casing);
+    }
+
+    const totalW = xOffset + wiringMaxX + MARGIN;
+
+    const totalH = Math.max(
+      rightPanelResult  ? rightPanelResult.panelBottom  + MARGIN : 0,
+      panelResult       ? panelResult.panelBottom       + MARGIN : 0,
+      wiringMaxY + MARGIN
+    );
+
+    const wireSVG = edges.map(({ wire, sections }) => {
+      if (!sections.length) return '';
+      const color = WIRE_COLORS[wire.color] || wire.color;
+      return sections.map(section => {
+        const pts = [section.startPoint, ...(section.bendPoints || []), section.endPoint];
+        const d   = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+        return `      <path d="${d}" stroke="${color}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+      }).join('\n');
+    }).join('\n');
+
+    const compSVG = components.map(comp => {
+      const pos = positions[comp.id];
+      if (!pos) return '';
+      return getComponentDef(comp.type).svg(pos.x, pos.y, comp.props, comp.id);
+    }).join('\n');
+
+    return [
+      `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${totalW} ${totalH}">`,
+      `  <rect width="${totalW}" height="${totalH}" fill="#F5F5F5"/>`,
+      panelResult      ? panelResult.svg      : null,
+      rightPanelResult ? rightPanelResult.svg : null,
+      `  <g id="wiring" transform="translate(${xOffset}, 0)">`,
+      `    <g id="wires">`,
+      wireSVG,
+      `    </g>`,
+      `    <g id="components">`,
+      compSVG,
+      `    </g>`,
+      `  </g>`,
+      `</svg>`,
+    ].filter(Boolean).join('\n');
+  }
+
+  function buildPanel(casing) {
+    const entries = Object.entries(casing.conduits || {});
+    if (entries.length === 0) return null;
+
+    const panelW = casing.width  || PANEL_W_DEF;
+    const panelH = casing.height || PANEL_H_DEF;
+    const panelX = MARGIN;
+    const panelY = MARGIN;
+
+    const connectorPoints = {};
+    const markers = [];
+
+    for (const [id, def] of entries) {
+      const wall     = def.wall     || 'back';
+      const position = def.position || 'center';
+      const { x: cx, y: cy } = markerPos(wall, position, panelX, panelY, panelW, panelH);
+
+      connectorPoints[id] = { x: cx, y: cy };
+
+      markers.push(
+        `    <circle cx="${cx}" cy="${cy}" r="${MARKER_R}" fill="#FF8C00" stroke="#555" stroke-width="1.5"/>`,
+        `    <circle cx="${cx}" cy="${cy}" r="${Math.round(MARKER_R * 0.45)}" fill="#E8E8E8"/>`,
+      );
+
+      const lbl = labelPos(wall, cx, cy);
+      markers.push(
+        `    <text x="${lbl.x}" y="${lbl.y}" text-anchor="${lbl.anchor}" font-family="sans-serif" font-size="8" fill="#333">${id}</text>`,
+      );
+    }
+
+    const svg = [
+      `  <g id="casing">`,
+      `    <rect x="${panelX}" y="${panelY}" width="${panelW}" height="${panelH}" fill="#AAAAAA" stroke="#555" stroke-width="2" rx="4"/>`,
+      ...markers,
+      `  </g>`,
+    ].join('\n');
+
+    return {
+      svg,
+      panelRight:  panelX + panelW,
+      panelBottom: panelY + panelH,
+      connectorPoints,
+    };
+  }
+
+  function markerPos(wall, position, panelX, panelY, panelW, panelH) {
+    switch (wall) {
+      case 'top':    return { x: panelX + panelW * (H_FRAC[position] ?? 0.5), y: panelY };
+      case 'bottom': return { x: panelX + panelW * (H_FRAC[position] ?? 0.5), y: panelY + panelH };
+      case 'left':   return { x: panelX,           y: panelY + panelH * (V_FRAC[position] ?? 0.5) };
+      case 'right':  return { x: panelX + panelW,  y: panelY + panelH * (V_FRAC[position] ?? 0.5) };
+      case 'back':
+      default:       return { x: panelX + panelW * (H_FRAC[position] ?? 0.5),
+                               y: panelY + panelH * (V_FRAC[position] ?? 0.5) };
+    }
+  }
+
+  function labelPos(wall, cx, cy) {
+    const off = MARKER_R + 5;
+    switch (wall) {
+      case 'top':    return { x: cx,       y: cy + off + 5, anchor: 'middle' };
+      case 'bottom': return { x: cx,       y: cy - off,     anchor: 'middle' };
+      case 'left':   return { x: cx + off, y: cy + 4,       anchor: 'start'  };
+      case 'right':  return { x: cx - off, y: cy + 4,       anchor: 'end'    };
+      default:       return { x: cx + off, y: cy + 4,       anchor: 'start'  };
+    }
+  }
+
+  function buildRightPanel(modules, panelX, panelY, casing) {
+    const panelW = casing.width  || PANEL_W_DEF;
+    const panelH = casing.height || PANEL_H_DEF;
+
+    const stackH  = modules.length * MOD_H + (modules.length - 1) * MOD_GAP;
+    const startY  = panelY + (panelH - stackH) / 2;
+    const moduleX = panelX + (panelW - MOD_W) / 2;
+
+    const moduleSVGs = modules.map((type, i) =>
+      renderModule(type, moduleX, startY + i * (MOD_H + MOD_GAP))
+    );
+
+    const svg = [
+      `  <g id="right-panel">`,
+      `    <rect x="${panelX}" y="${panelY}" width="${panelW}" height="${panelH}" fill="#F5EDD8" stroke="#555" stroke-width="2" rx="4"/>`,
+      ...moduleSVGs,
+      `  </g>`,
+    ].join('\n');
+
+    return {
+      svg,
+      panelRight:  panelX + panelW,
+      panelBottom: panelY + panelH,
+    };
+  }
+
+  function renderModule(type, x, y) {
+    if (type === 'tipo_l') {
+      const pinXs = [
+        Math.round(MOD_W * 0.25),
+        Math.round(MOD_W * 0.50),
+        Math.round(MOD_W * 0.75),
+      ];
+      const pins = pinXs.map(ox =>
+        `    <circle cx="${x + ox}" cy="${y + MOD_H / 2}" r="4" fill="#444" stroke="#222" stroke-width="1"/>`
+      ).join('\n');
+      return [
+        `    <rect x="${x}" y="${y}" width="${MOD_W}" height="${MOD_H}" fill="#F0EDE8" stroke="#444" stroke-width="1" rx="2"/>`,
+        pins,
+      ].join('\n');
+    }
+    return `    <rect x="${x}" y="${y}" width="${MOD_W}" height="${MOD_H}" fill="#CBBA96" stroke="#555" stroke-width="1" rx="2"/>`;
+  }
+
+  // ── main ──────────────────────────────────────────────────────────────────
+
+  async function main() {
+    const params = new URLSearchParams(window.location.search);
+    const file   = params.get('file') || 'examples/basic.yaml';
+
+    const response = await fetch(file);
+    if (!response.ok) throw new Error(`Failed to load "${file}": ${response.status} ${response.statusText}`);
+    const source = await response.text();
+
+    const graph        = parse(source);
+    const layoutResult = await layout(graph);
+    const svg          = render(graph, layoutResult);
+
+    document.body.innerHTML = svg;
+  }
+
+  main().catch(err => {
+    document.body.innerHTML = `<div id="error">Error: ${err.message}</div>`;
+    console.error(err);
+  });
+  </script>
+</body>
+</html>
