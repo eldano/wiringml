@@ -39,9 +39,9 @@ function sideCoord(side, n, step, w, h) {
  * Single portless connection on a wall-aware conduit: still gets a centred port on
  * the correct side (so ELK doesn't pick an arbitrary boundary point).
  */
-function assignAutoPorts(components, wires, casing) {
+function assignAutoPorts(components, wires, overviews) {
   const compById       = Object.fromEntries(components.map(c => [c.id, c]));
-  const casingConduits = casing?.conduits || {};
+  const casingConduits = overviews?.casing || {};
 
   const resolvedWires = wires.map(w => ({
     ...w, from: { ...w.from }, to: { ...w.to },
@@ -112,10 +112,10 @@ function assignAutoPorts(components, wires, casing) {
  * Returns { positions: { [id]: { x, y, width, height } }, edges: [{ wire, sections }] }
  */
 async function layout(graph) {
-  const { components, wires, casing } = graph;
+  const { components, wires, overviews } = graph;
   if (components.length === 0) return { positions: {}, edges: [] };
 
-  const { resolvedWires, extraPorts } = assignAutoPorts(components, wires, casing);
+  const { resolvedWires, extraPorts } = assignAutoPorts(components, wires, overviews);
 
   const elkGraph = {
     id: 'root',

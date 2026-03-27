@@ -23,14 +23,14 @@ const V_FRAC = { top:  0.2, center: 0.5, bottom: 0.8 };
  * connected to the wiring diagram on the right via dashed lines.
  */
 function render(graph, { positions, edges }) {
-  const { components, casing } = graph;
+  const { components, overviews } = graph;
 
   // --- Panel section (optional) ---
   let panelResult = null;
   let xOffset     = 0;
 
-  if (casing && Object.keys(casing.conduits || {}).length > 0) {
-    panelResult = buildPanel(casing);
+  if (overviews && Object.keys(overviews.casing || {}).length > 0) {
+    panelResult = buildPanel(overviews);
     xOffset     = panelResult.panelRight + PANEL_GAP;
   }
 
@@ -43,10 +43,10 @@ function render(graph, { positions, edges }) {
 
   // --- Right panel (closed enclosure schematic) — sits below the open casing ---
   let rightPanelResult = null;
-  if (casing?.modules?.length) {
+  if (overviews?.modules?.length) {
     const rpX = MARGIN;
     const rpY = (panelResult ? panelResult.panelBottom : MARGIN) + 20;
-    rightPanelResult = buildRightPanel(casing.modules, rpX, rpY, casing);
+    rightPanelResult = buildRightPanel(overviews.modules, rpX, rpY, overviews);
   }
 
   const totalW = xOffset + wiringMaxX + MARGIN;
@@ -102,12 +102,12 @@ function render(graph, { positions, edges }) {
  *
  * Returns { svg, panelRight, panelBottom, connectorPoints }
  */
-function buildPanel(casing) {
-  const entries = Object.entries(casing.conduits || {});
+function buildPanel(overviews) {
+  const entries = Object.entries(overviews.casing || {});
   if (entries.length === 0) return null;
 
-  const panelW = casing.width  || PANEL_W_DEF;
-  const panelH = casing.height || PANEL_H_DEF;
+  const panelW = overviews.width  || PANEL_W_DEF;
+  const panelH = overviews.height || PANEL_H_DEF;
   const panelX = MARGIN;
   const panelY = MARGIN;
 
@@ -179,9 +179,9 @@ function labelPos(wall, cx, cy) {
  * Modules are stacked vertically and centred inside the panel rectangle.
  * Supported module types: 'tipo_l' (rectangle + 3 pin holes), 'closed' (blank rectangle).
  */
-function buildRightPanel(modules, panelX, panelY, casing) {
-  const panelW = casing.width  || PANEL_W_DEF;
-  const panelH = casing.height || PANEL_H_DEF;
+function buildRightPanel(modules, panelX, panelY, overviews) {
+  const panelW = overviews.width  || PANEL_W_DEF;
+  const panelH = overviews.height || PANEL_H_DEF;
 
   const stackH  = modules.length * MOD_H + (modules.length - 1) * MOD_GAP;
   const startY  = panelY + (panelH - stackH) / 2;

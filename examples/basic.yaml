@@ -1,5 +1,5 @@
-casing:
-  conduits:
+overviews:
+  casing:
     conduit_1: {wall: top, position: left}
     conduit_2: {wall: top, position: right}
   modules:
