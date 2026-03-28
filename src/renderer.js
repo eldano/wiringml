@@ -29,9 +29,8 @@ function render(graph, { positions, edges }) {
   let panelResult = null;
   let xOffset     = 0;
 
-  if (overviews && Object.keys(overviews.casing || {}).length > 0) {
+  if (overviews?.casing !== undefined) {
     panelResult = buildPanel(overviews);
-    xOffset     = panelResult.panelRight + PANEL_GAP;
   }
 
   // --- Wiring diagram bounds ---
@@ -41,15 +40,22 @@ function render(graph, { positions, edges }) {
     if (pos.y + pos.height > wiringMaxY) wiringMaxY = pos.y + pos.height;
   }
 
-  // --- Right panel (closed enclosure schematic) — sits below the open casing ---
-  let rightPanelResult = null;
-  if (overviews?.modules?.length) {
-    const rpX = MARGIN;
-    const rpY = (panelResult ? panelResult.panelBottom : MARGIN) + 20;
-    rightPanelResult = buildRightPanel(overviews.modules, rpX, rpY, overviews);
+  // Only shift the wiring diagram rightward when there's actually a circuit to show
+  if (panelResult && components.length > 0) {
+    xOffset = panelResult.panelRight + PANEL_GAP;
   }
 
-  const totalW = xOffset + wiringMaxX + MARGIN;
+  // --- Right panel (closed enclosure schematic) — sits below the open casing ---
+  let rightPanelResult = null;
+  if (overviews?.modules !== undefined) {
+    const rpX = MARGIN;
+    const rpY = (panelResult ? panelResult.panelBottom : MARGIN) + 20;
+    rightPanelResult = buildRightPanel(overviews.modules || [], rpX, rpY, overviews);
+  }
+
+  const totalW = components.length > 0
+    ? xOffset + wiringMaxX + MARGIN
+    : 1000;
 
   const NOTE_H    = notes.length ? notes.length * 18 + 12 : 0;
   const totalH = Math.max(
@@ -88,14 +94,16 @@ function render(graph, { positions, edges }) {
     titleSVG,
     panelResult      ? panelResult.svg      : null,
     rightPanelResult ? rightPanelResult.svg : null,
-    `  <g id="wiring" transform="translate(${xOffset}, 0)">`,
-    `    <g id="wires">`,
-    wireSVG,
-    `    </g>`,
-    `    <g id="components">`,
-    compSVG,
-    `    </g>`,
-    `  </g>`,
+    components.length > 0 ? [
+      `  <g id="wiring" transform="translate(${xOffset}, 0)">`,
+      `    <g id="wires">`,
+      wireSVG,
+      `    </g>`,
+      `    <g id="components">`,
+      compSVG,
+      `    </g>`,
+      `  </g>`,
+    ].join('\n') : null,
     notes.length ? [
       `  <g id="notes" font-family="sans-serif" font-size="11" fill="#555">`,
       ...notes.map((n, i) =>
@@ -117,7 +125,6 @@ function render(graph, { positions, edges }) {
  */
 function buildPanel(overviews) {
   const entries = Object.entries(overviews.casing || {});
-  if (entries.length === 0) return null;
 
   const panelW = overviews.width  || PANEL_W_DEF;
   const panelH = overviews.height || PANEL_H_DEF;
@@ -196,17 +203,20 @@ function buildRightPanel(modules, panelX, panelY, overviews) {
   const panelW = overviews.width  || PANEL_W_DEF;
   const panelH = overviews.height || PANEL_H_DEF;
 
-  const stackH  = modules.length * MOD_H + (modules.length - 1) * MOD_GAP;
-  const startY  = panelY + (panelH - stackH) / 2;
-  const moduleX = panelX + (panelW - MOD_W) / 2;
+  let moduleSVGs = [];
+  if (modules.length > 0) {
+    const stackH  = modules.length * MOD_H + (modules.length - 1) * MOD_GAP;
+    const startY  = panelY + (panelH - stackH) / 2;
+    const moduleX = panelX + (panelW - MOD_W) / 2;
+    moduleSVGs = modules.map((type, i) =>
+      renderModule(type, moduleX, startY + i * (MOD_H + MOD_GAP))
+    );
+  }
 
-  const moduleSVGs = modules.map((type, i) =>
-    renderModule(type, moduleX, startY + i * (MOD_H + MOD_GAP))
-  );
-
+  const fill = modules.length > 0 ? '#F5EDD8' : '#555555';
   const svg = [
     `  <g id="right-panel">`,
-    `    <rect x="${panelX}" y="${panelY}" width="${panelW}" height="${panelH}" fill="#F5EDD8" stroke="#555" stroke-width="2" rx="4"/>`,
+    `    <rect x="${panelX}" y="${panelY}" width="${panelW}" height="${panelH}" fill="${fill}" stroke="#555" stroke-width="2" rx="4"/>`,
     ...moduleSVGs,
     `  </g>`,
   ].join('\n');

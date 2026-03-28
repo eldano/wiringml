@@ -184,9 +184,11 @@ const COMPONENTS = {
       // spreadZone confines auto-spreading to the strip area of each channel.
       const GAP = 6;
       return {
-        a:      { x: 40,  y: 0, spreadZone: { start: GAP,      end: 80 - GAP } },
-        b:      { x: 120, y: 0, spreadZone: { start: 80 + GAP, end: 160 - GAP } },
-        center: { x: 80,  y: 15 },
+        a:          { x: 40,  y: 0,  spreadZone: { start: GAP,      end: 80 - GAP  } },
+        b:          { x: 120, y: 0,  spreadZone: { start: 80 + GAP, end: 160 - GAP } },
+        'a.bottom': { x: 40,  y: 30, spreadZone: { start: GAP,      end: 80 - GAP  } },
+        'b.bottom': { x: 120, y: 30, spreadZone: { start: 80 + GAP, end: 160 - GAP } },
+        center:     { x: 80,  y: 15 },
       };
     },
     svg(x, y, _props, id) {

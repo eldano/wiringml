@@ -1,0 +1,69 @@
+props:
+  title: LIV.N.90
+
+notes:
+  - "El switch prende la luz del techo pero no se si la luz se conecta por el ducto 1 o 2"
+
+overviews:
+  casing:
+    conduit_1: {wall: top, position: left}
+    conduit_2: {wall: top, position: right}
+    conduit_3: {wall: back, position: center}
+  modules:
+    - closed
+    - switch-1p
+    - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 80
+    y: 30
+  conduit_2:
+    type: conduit
+    x: 560
+    y: 30
+  conduit_3:
+    type: conduit
+    wall: back
+    x: 320
+    y: 200
+  switch:
+    type: switch-1p
+    x: 290
+    y: 330
+  bornera:
+    type: 2-chan
+    x: 420
+    y: 180
+
+wires:
+  - color: white
+    from: conduit_1.bottom
+    to: switch.left
+  - color: white
+    from: switch.right
+    to: bornera.a.bottom
+  - color: white
+    from: conduit_1.bottom
+    to: conduit_2.bottom
+  - color: white
+    from: conduit_1.bottom
+    to: conduit_2.bottom
+  - color: white
+    from: conduit_1.bottom
+    to: bornera.b
+
+  - color: white
+    from: bornera.a
+    to: conduit_2.bottom
+  - color: white
+    from: bornera.b
+    to: conduit_2.bottom
+
+  - color: white
+    from: bornera.a.bottom
+    to: conduit_3.bottom
+  - color: white
+    from: bornera.b.bottom
+    to: conduit_3.bottom
