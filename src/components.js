@@ -125,6 +125,33 @@ const COMPONENTS = {
     },
   },
 
+  'switch-1p': {
+    // Single-pole switch. Ports: left and right on the horizontal centre axis.
+    // Temporary symbol: rectangle with terminal dots and an angled blade line.
+    width: 60,
+    height: 30,
+    ports() {
+      return {
+        left:   { x: 0,  y: 15 },
+        right:  { x: 60, y: 15 },
+        center: { x: 30, y: 15 },
+      };
+    },
+    svg(x, y, _props, id) {
+      return [
+        `<g class="component switch-1p">`,
+        `  <rect x="${x}" y="${y}" width="60" height="30" fill="#FFF9E6" stroke="#888" stroke-width="1.5" rx="3"/>`,
+        // Terminal dots
+        `  <circle cx="${x}" cy="${y + 15}" r="3" fill="#555"/>`,
+        `  <circle cx="${x + 60}" cy="${y + 15}" r="3" fill="#555"/>`,
+        // Blade (angled line suggesting open switch contact)
+        `  <line x1="${x + 8}" y1="${y + 15}" x2="${x + 48}" y2="${y + 9}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <text x="${x + 30}" y="${y + 26}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#888">${id}</text>`,
+        `</g>`,
+      ].join('\n');
+    },
+  },
+
   enclosure: {
     width: 160,
     height: 110,

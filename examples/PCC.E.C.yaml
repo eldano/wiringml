@@ -1,0 +1,37 @@
+props:
+  title: PCC.E.C
+
+overviews:
+  casing:
+    conduit_1: {wall: top, position: left}
+    conduit_2: {wall: top, position: right}
+  modules:
+    - closed
+    - switch-1p
+    - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 80
+    y: 30
+  conduit_2:
+    type: conduit
+    x: 560
+    y: 30
+  switch:
+    type: switch-1p
+    x: 290
+    y: 180
+
+wires:
+  - color: white
+    from: conduit_1.bottom
+    to: conduit_2.bottom
+
+  - color: white
+    from: conduit_1.bottom
+    to: switch.left
+  - color: white
+    from: switch.right
+    to: conduit_2.bottom

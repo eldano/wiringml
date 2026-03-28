@@ -60,7 +60,6 @@ wires:
     from: plug_top.gnd.top
     to: conduit_2.bottom
 
-  # plug_bottom — wired port-by-port from plug_top (exits top, enters bottom)
   - color: brown
     from: plug_top.right.bottom
     to: plug_bottom.right.top

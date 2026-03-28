@@ -211,6 +211,16 @@ function buildRightPanel(modules, panelX, panelY, overviews) {
 }
 
 function renderModule(type, x, y) {
+  if (type === 'switch-1p') {
+    const cx = x + MOD_W / 2;
+    const cy = y + MOD_H / 2;
+    return [
+      `    <rect x="${x}" y="${y}" width="${MOD_W}" height="${MOD_H}" fill="#FFF9E6" stroke="#888" stroke-width="1" rx="2"/>`,
+      `    <circle cx="${x}" cy="${cy}" r="3" fill="#555"/>`,
+      `    <circle cx="${x + MOD_W}" cy="${cy}" r="3" fill="#555"/>`,
+      `    <line x1="${x + 6}" y1="${cy}" x2="${x + MOD_W - 6}" y2="${cy - 5}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+    ].join('\n');
+  }
   if (type === 'tipo_l') {
     const pinXs = [
       Math.round(MOD_W * 0.25),
