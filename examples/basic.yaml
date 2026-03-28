@@ -30,29 +30,26 @@ components:
     y: 200
 
 wires:
-  # Blue wires — channel A
-  - color: blue
+  - color: white
     from: conduit_1.bottom
     to: bornera.a1
-  - color: blue
+  - color: brown
     from: bornera.a2
     to: conduit_2.bottom
-  - color: blue
+  - color: brown
     from: bornera.a3
     to: plug_top.neutral.t
 
-  # White wires
   - color: white
     from: conduit_1.bottom
     to: bornera.b1
-  - color: white
+  - color: brown
     from: bornera.b2
     to: conduit_2
-  - color: white
+  - color: brown
     from: bornera.b3
     to: plug_top.live.t
 
-  # Green wires
   - color: green
     from: conduit_1.bottom
     to: plug_bottom.ground.b
@@ -61,10 +58,10 @@ wires:
     to: conduit_2.bottom
 
   # plug_bottom — wired port-by-port from plug_top (exits top, enters bottom)
-  - color: blue
+  - color: brown
     from: plug_top.neutral.b
     to: plug_bottom.neutral.t
-  - color: white
+  - color: brown
     from: plug_top.live.b
     to: plug_bottom.live.t
   - color: green
