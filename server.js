@@ -12,46 +12,167 @@ const { render } = require('./src/renderer');
 const PORT         = 3050;
 const EXAMPLES_DIR = path.join(__dirname, 'examples');
 
-const server = http.createServer(async (req, res) => {
-  if (req.url === '/examples' || req.url === '/examples/') {
-    const names = fs.readdirSync(EXAMPLES_DIR)
-      .filter(f => f.endsWith('.yaml'))
-      .map(f => f.slice(0, -5));
+function listExamples() {
+  return fs.readdirSync(EXAMPLES_DIR)
+    .filter(f => f.endsWith('.yaml'))
+    .map(f => f.slice(0, -5))
+    .sort();
+}
 
-    const links = names
-      .map(n => `  <li><a href="/examples/${n}">${n}</a></li>`)
-      .join('\n');
-
-    const html = `<!DOCTYPE html>
+const SHELL = (names) => `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WiringML Examples</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WiringML</title>
   <style>
-    body { font-family: sans-serif; padding: 2rem; background: #f5f5f5; }
-    a { color: #1565C0; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    li { margin: 0.4rem 0; font-size: 1.1rem; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: sans-serif;
+      background: #E8E8E8;
+    }
+
+    #layout {
+      display: flex;
+      height: 100%;
+    }
+
+    #sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: #fff;
+      border-right: 1px solid #ddd;
+      padding: 1.5rem 1rem;
+      overflow-y: auto;
+    }
+
+    #sidebar h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #999;
+      margin-bottom: 1rem;
+    }
+
+    #sidebar ul {
+      list-style: none;
+    }
+
+    #sidebar li a {
+      display: block;
+      padding: 0.4rem 0.5rem;
+      border-radius: 4px;
+      color: #1565C0;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    #sidebar li a:hover  { background: #f0f4ff; }
+    #sidebar li a.active { background: #E3ECFF; font-weight: 600; }
+
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      overflow: hidden;
+    }
+
+    #placeholder {
+      margin: auto;
+      color: #aaa;
+      font-size: 1.1rem;
+    }
+
+    #diagram {
+      flex: 1;
+      display: none;
+    }
+
+    #diagram svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #error {
+      color: #c62828;
+      font-size: 0.9rem;
+      margin: auto;
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <h2>Examples</h2>
-  <ul>
-${links}
-  </ul>
+  <div id="layout">
+    <nav id="sidebar">
+      <h2>Examples</h2>
+      <ul>
+        ${names.map(n => `<li><a href="#${n}" data-name="${n}">${n}</a></li>`).join('\n        ')}
+      </ul>
+    </nav>
+    <main id="main">
+      <p id="placeholder">Select an example</p>
+      <div id="diagram"></div>
+      <p id="error"></p>
+    </main>
+  </div>
+  <script>
+    const diagram     = document.getElementById('diagram');
+    const placeholder = document.getElementById('placeholder');
+    const errorEl     = document.getElementById('error');
+
+    async function load(name) {
+      document.querySelectorAll('#sidebar a').forEach(a => a.classList.toggle('active', a.dataset.name === name));
+      try {
+        const res = await fetch('/examples/' + name);
+        if (!res.ok) throw new Error(await res.text());
+        const svg = await res.text();
+        diagram.innerHTML    = svg;
+        diagram.style.display    = 'block';
+        placeholder.style.display = 'none';
+        errorEl.style.display    = 'none';
+      } catch (err) {
+        errorEl.textContent   = 'Error: ' + err.message;
+        errorEl.style.display = 'block';
+        diagram.style.display     = 'none';
+        placeholder.style.display = 'none';
+      }
+    }
+
+    document.getElementById('sidebar').addEventListener('click', e => {
+      const a = e.target.closest('a[data-name]');
+      if (!a) return;
+      e.preventDefault();
+      history.pushState({}, '', a.href);
+      load(a.dataset.name);
+    });
+
+    // Load from URL hash on first visit
+    const initial = location.hash.slice(1);
+    if (initial) load(initial);
+  </script>
 </body>
 </html>`;
 
+const server = http.createServer(async (req, res) => {
+  const url = req.url.split('?')[0];
+
+  // Shell page
+  if (url === '/' || url === '/examples' || url === '/examples/') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(html);
+    res.end(SHELL(listExamples()));
     return;
   }
 
-  const match = req.url.match(/^\/examples\/([^/?#]+)\/?$/);
-
+  // SVG fragment for a named diagram
+  const match = url.match(/^\/examples\/([^/?#]+)\/?$/);
   if (!match) {
     res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not found. Try /examples');
+    res.end('Not found');
     return;
   }
 
@@ -69,53 +190,14 @@ ${links}
     const graph       = parse(source);
     const layoutResult = await layout(graph);
     const svg         = render(graph, layoutResult);
-
-    const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${name}</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 24px;
-      box-sizing: border-box;
-      width: 100%;
-      height: 100%;
-      background: #E8E8E8;
-    }
-    #back {
-      display: inline-block;
-      margin-bottom: 12px;
-      font-family: sans-serif;
-      font-size: 1.15rem;
-      color: #1565C0;
-      text-decoration: none;
-    }
-    #back:hover { text-decoration: underline; }
-    svg {
-      display: block;
-      width: 100%;
-      height: calc(100% - 32px);
-    }
-  </style>
-</head>
-<body>
-  <a id="back" href="/examples">← Examples</a>
-  ${svg}
-</body>
-</html>`;
-
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(html);
+    res.writeHead(200, { 'Content-Type': 'image/svg+xml; charset=utf-8' });
+    res.end(svg);
   } catch (err) {
     res.writeHead(500, { 'Content-Type': 'text/plain' });
-    res.end(`Error rendering diagram: ${err.message}`);
+    res.end(err.message);
   }
 });
 
 server.listen(PORT, () => {
   console.log(`WiringML server running at http://localhost:${PORT}`);
-  console.log(`Example: http://localhost:${PORT}/examples/liv.s.135`);
 });
