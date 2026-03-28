@@ -4,6 +4,7 @@
   "description": "Declarative wiring diagram tool — text in, SVG out",
   "main": "cli.js",
   "scripts": {
+    "start": "nodemon server.js",
     "example": "node cli.js examples/liv.s.135.yaml > examples/liv.s.135.html",
     "example2": "node cli.js examples/liv.w.180.yaml > examples/liv.w.180.html"
   },
@@ -11,5 +12,8 @@
   "dependencies": {
     "elkjs": "^0.11.1",
     "js-yaml": "^4.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }
