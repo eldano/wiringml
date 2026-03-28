@@ -11,23 +11,23 @@ components:
   conduit_1:
     type: conduit
     x: 60
-    y: 50
+    y: 20
   conduit_2:
     type: conduit
-    x: 780
-    y: 50
+    x: 580
+    y: 20
   plug_top:
     type: tipo_l
-    x: 455
-    y: 160
+    x: 440
+    y: 120
   plug_bottom:
     type: tipo_l
-    x: 455
-    y: 270
+    x: 440
+    y: 220
   bornera:
     type: 2x3
-    x: 210
-    y: 200
+    x: 190
+    y: 120
 
 wires:
   - color: white
@@ -38,7 +38,7 @@ wires:
     to: conduit_2.bottom
   - color: brown
     from: bornera.a
-    to: plug_top.neutral.t
+    to: plug_top.right.top
 
   - color: white
     from: conduit_1.bottom
@@ -48,22 +48,22 @@ wires:
     to: conduit_2
   - color: brown
     from: bornera.b
-    to: plug_top.live.t
+    to: plug_top.left.top
 
   - color: green
     from: conduit_1.bottom
-    to: plug_bottom.ground.b
+    to: plug_bottom.gnd.bottom
   - color: green
-    from: plug_top.ground.t
+    from: plug_top.gnd.top
     to: conduit_2.bottom
 
   # plug_bottom — wired port-by-port from plug_top (exits top, enters bottom)
   - color: brown
-    from: plug_top.neutral.b
-    to: plug_bottom.neutral.t
+    from: plug_top.right.bottom
+    to: plug_bottom.right.top
   - color: brown
-    from: plug_top.live.b
-    to: plug_bottom.live.t
+    from: plug_top.left.bottom
+    to: plug_bottom.left.top
   - color: green
-    from: plug_top.ground.b
-    to: plug_bottom.ground.t
+    from: plug_top.gnd.bottom
+    to: plug_bottom.gnd.top
