@@ -1,0 +1,46 @@
+props:
+  title: LIV.W.180
+
+overviews:
+  casing:
+    conduit_1: {wall: top, position: left}
+    conduit_2: {wall: top, position: right}
+  modules:
+    - closed
+    - tipo_l
+    - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 60
+    y: 20
+  conduit_2:
+    type: conduit
+    x: 580
+    y: 20
+  plug:
+    type: tipo_l
+    x: 300
+    y: 120
+
+wires:
+  - color: brown
+    from: conduit_1.bottom
+    to: plug.left.top
+  - color: brown
+    from: conduit_1.bottom
+    to: plug.right.top
+  - color: green
+    from: conduit_1.bottom
+    to: plug.gnd.top
+
+  - color: brown
+    from: plug.left.bottom
+    to: conduit_2.bottom
+  - color: brown
+    from: plug.right.bottom
+    to: conduit_2.bottom
+  - color: green
+    from: plug.gnd.bottom
+    to: conduit_2.bottom
