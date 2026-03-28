@@ -1,6 +1,9 @@
 props:
   title: PCC.E.C
 
+notes:
+  - "⚠️ Switch corta neutro"
+
 overviews:
   casing:
     conduit_1: {wall: top, position: left}

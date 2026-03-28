@@ -23,7 +23,7 @@ const V_FRAC = { top:  0.2, center: 0.5, bottom: 0.8 };
  * connected to the wiring diagram on the right via dashed lines.
  */
 function render(graph, { positions, edges }) {
-  const { components, overviews, props = {} } = graph;
+  const { components, overviews, props = {}, notes = [] } = graph;
 
   // --- Panel section (optional) ---
   let panelResult = null;
@@ -51,11 +51,12 @@ function render(graph, { positions, edges }) {
 
   const totalW = xOffset + wiringMaxX + MARGIN;
 
+  const NOTE_H    = notes.length ? notes.length * 18 + 12 : 0;
   const totalH = Math.max(
     rightPanelResult  ? rightPanelResult.panelBottom  + MARGIN : 0,
     panelResult       ? panelResult.panelBottom       + MARGIN : 0,
     wiringMaxY + MARGIN
-  );
+  ) + NOTE_H;
 
   // --- Wires (ELK-routed, drawn in wiring coordinate space) ---
   const wireSVG = edges.map(({ wire, sections }) => {
@@ -95,6 +96,13 @@ function render(graph, { positions, edges }) {
     compSVG,
     `    </g>`,
     `  </g>`,
+    notes.length ? [
+      `  <g id="notes" font-family="sans-serif" font-size="11" fill="#555">`,
+      ...notes.map((n, i) =>
+        `    <text x="${MARGIN}" y="${totalH - NOTE_H + 16 + i * 18}">${n}</text>`
+      ),
+      `  </g>`,
+    ].join('\n') : null,
     `</svg>`,
   ].filter(Boolean).join('\n');
 }
