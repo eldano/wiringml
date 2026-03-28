@@ -1,0 +1,34 @@
+props:
+  title: LIV.N.180
+
+notes:
+  - "⚠️ el módulo se sale para afuera al desenchufar algo"
+
+overviews:
+  casing:
+    conduit_1: {wall: top, position: right}
+  modules:
+    - closed
+    - tipo_l
+    - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 500
+    y: 30
+  plug:
+    type: tipo_l
+    x: 270
+    y: 160
+
+wires:
+  - color: brown
+    from: conduit_1.bottom
+    to: plug.left.top
+  - color: brown
+    from: conduit_1.bottom
+    to: plug.right.top
+  - color: green
+    from: conduit_1.bottom
+    to: plug.gnd.top
