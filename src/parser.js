@@ -32,8 +32,9 @@ function parse(source) {
   }));
 
   const overviews = doc.overviews || null;
+  const props     = doc.props     || {};
 
-  return { components, wires, overviews };
+  return { components, wires, overviews, props };
 }
 
 function parseEndpoint(str) {

@@ -23,7 +23,7 @@ const V_FRAC = { top:  0.2, center: 0.5, bottom: 0.8 };
  * connected to the wiring diagram on the right via dashed lines.
  */
 function render(graph, { positions, edges }) {
-  const { components, overviews } = graph;
+  const { components, overviews, props = {} } = graph;
 
   // --- Panel section (optional) ---
   let panelResult = null;
@@ -76,10 +76,15 @@ function render(graph, { positions, edges }) {
   }).join('\n');
 
 
+  const titleSVG = props.title
+    ? `  <text x="${MARGIN}" y="${MARGIN - 8}" font-family="sans-serif" font-size="13" font-weight="bold" fill="#444">${props.title}</text>`
+    : null;
+
   return [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${totalW} ${totalH}">`,
     `  <rect width="${totalW}" height="${totalH}" fill="#F5F5F5"/>`,
+    titleSVG,
     panelResult      ? panelResult.svg      : null,
     rightPanelResult ? rightPanelResult.svg : null,
     `  <g id="wiring" transform="translate(${xOffset}, 0)">`,
@@ -109,7 +114,7 @@ function buildPanel(overviews) {
   const panelW = overviews.width  || PANEL_W_DEF;
   const panelH = overviews.height || PANEL_H_DEF;
   const panelX = MARGIN;
-  const panelY = MARGIN;
+  const panelY = MARGIN + 20;
 
   const connectorPoints = {};
   const markers = [];
