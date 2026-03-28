@@ -147,9 +147,9 @@ const COMPONENTS = {
     },
   },
 
-  '2x3': {
-    // 2 independent channels (A and B), each accepting up to 3 wires.
-    // Ports: a1-a3 on the top edge of channel A, b1-b3 on the top edge of channel B.
+  '2-chan': {
+    // 2 independent channels (A and B) accepting N wires
+    // Ports: a on the top edge of channel A, b on the top edge of channel B.
     width: 160,
     height: 30,
     ports() {
@@ -169,7 +169,7 @@ const COMPONENTS = {
       const STRIP_W = 80 - GAP * 2;
       const STRIP_Y = y + (H - STRIP_H) / 2;  // vertically centred
       return [
-        `<g class="component 2x3">`,
+        `<g class="component 2-chan">`,
         `  <rect x="${x}" y="${y}" width="160" height="${H}" fill="#ECEFF1" stroke="#444" stroke-width="1.5" rx="2"/>`,
         `  <line x1="${x + 80}" y1="${y}" x2="${x + 80}" y2="${y + H}" stroke="#AAA" stroke-width="1" stroke-dasharray="3,2"/>`,
         `  <rect x="${x + GAP}" y="${STRIP_Y}" width="${STRIP_W}" height="${STRIP_H}" fill="#AAA" stroke="#555" stroke-width="1" rx="2"/>`,

@@ -28,7 +28,7 @@ components:
     x: 440
     y: 220
   bornera:
-    type: 2x3
+    type: 2-chan
     x: 190
     y: 120
 
