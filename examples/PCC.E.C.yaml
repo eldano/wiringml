@@ -2,7 +2,8 @@ props:
   title: PCC.E.C
 
 notes:
-  - "⚠️ Switch corta neutro"
+  - "- ⚠️ Switch corta neutro"
+  - "- ⚠️ Usar mejores símbolos para switch-1p (version en diagrama y en módulo)."
 
 overviews:
   casing:
