@@ -32,22 +32,22 @@ components:
 wires:
   - color: white
     from: conduit_1.bottom
-    to: bornera.a1
+    to: bornera.a
   - color: brown
-    from: bornera.a2
+    from: bornera.a
     to: conduit_2.bottom
   - color: brown
-    from: bornera.a3
+    from: bornera.a
     to: plug_top.neutral.t
 
   - color: white
     from: conduit_1.bottom
-    to: bornera.b1
+    to: bornera.b
   - color: brown
-    from: bornera.b2
+    from: bornera.b
     to: conduit_2
   - color: brown
-    from: bornera.b3
+    from: bornera.b
     to: plug_top.live.t
 
   - color: green

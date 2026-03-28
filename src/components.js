@@ -152,30 +152,32 @@ const COMPONENTS = {
     // 2 independent channels (A and B), each accepting up to 3 wires.
     // Ports: a1-a3 on the top edge of channel A, b1-b3 on the top edge of channel B.
     width: 160,
-    height: 55,
+    height: 30,
     ports() {
-      // Channel A occupies left half (0–80), channel B right half (80–160).
-      // 3 ports per channel, evenly spaced within each half.
+      // Channel A: left half (0–80), channel B: right half (80–160).
+      // spreadZone confines auto-spreading to the strip area of each channel.
+      const GAP = 6;
       return {
-        a1: { x: 18, y: 0 }, a2: { x: 40, y: 0 }, a3: { x: 62, y: 0 },
-        b1: { x: 98, y: 0 }, b2: { x: 120, y: 0 }, b3: { x: 142, y: 0 },
-        center: { x: 80, y: 27 },
+        a:      { x: 40,  y: 0, spreadZone: { start: GAP,      end: 80 - GAP } },
+        b:      { x: 120, y: 0, spreadZone: { start: 80 + GAP, end: 160 - GAP } },
+        center: { x: 80,  y: 15 },
       };
     },
     svg(x, y, _props, id) {
-      const screws = (offsets) => offsets.map(ox =>
-        `<circle cx="${x + ox}" cy="${y + 14}" r="5" fill="#AAA" stroke="#555" stroke-width="1"/>` +
-        `<line x1="${x + ox - 3}" y1="${y + 14}" x2="${x + ox + 3}" y2="${y + 14}" stroke="#555" stroke-width="1"/>`
-      ).join('\n');
+      const H       = 30;
+      const GAP     = 6;
+      const STRIP_H = 10;
+      const STRIP_W = 80 - GAP * 2;
+      const STRIP_Y = y + (H - STRIP_H) / 2;  // vertically centred
       return [
         `<g class="component 2x3">`,
-        `  <rect x="${x}" y="${y}" width="160" height="55" fill="#ECEFF1" stroke="#444" stroke-width="1.5" rx="2"/>`,
-        `  <line x1="${x + 80}" y1="${y}" x2="${x + 80}" y2="${y + 55}" stroke="#AAA" stroke-width="1" stroke-dasharray="3,2"/>`,
-        `  <text x="${x + 40}" y="${y + 48}" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#666">A</text>`,
-        `  <text x="${x + 120}" y="${y + 48}" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#666">B</text>`,
-        screws([18, 40, 62]),
-        screws([98, 120, 142]),
-        `  <text x="${x + 80}" y="${y + 48}" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#888">${id}</text>`,
+        `  <rect x="${x}" y="${y}" width="160" height="${H}" fill="#ECEFF1" stroke="#444" stroke-width="1.5" rx="2"/>`,
+        `  <line x1="${x + 80}" y1="${y}" x2="${x + 80}" y2="${y + H}" stroke="#AAA" stroke-width="1" stroke-dasharray="3,2"/>`,
+        `  <rect x="${x + GAP}" y="${STRIP_Y}" width="${STRIP_W}" height="${STRIP_H}" fill="#AAA" stroke="#555" stroke-width="1" rx="2"/>`,
+        `  <rect x="${x + 80 + GAP}" y="${STRIP_Y}" width="${STRIP_W}" height="${STRIP_H}" fill="#AAA" stroke="#555" stroke-width="1" rx="2"/>`,
+        `  <text x="${x + 40}" y="${y + H - 4}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#666">A</text>`,
+        `  <text x="${x + 120}" y="${y + H - 4}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#666">B</text>`,
+        `  <text x="${x + 80}" y="${y + H - 4}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#888">${id}</text>`,
         `</g>`,
       ].join('\n');
     },

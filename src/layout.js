@@ -313,19 +313,26 @@ function buildSpreadMap(components, wires, positions) {
     const placed = positions[compId];
     if (!comp || !placed) continue;
 
-    // Resolve the base port to get the edge direction
+    // Resolve the base port to get the edge direction and optional spreadZone
     const { dir } = resolvePort(comp, portName, placed);
     if (!dir) continue; // center/flexible — can't determine an edge to spread along
+
+    const def        = getComponentDef(comp.type);
+    const portDef    = portName ? def.ports(comp.props)[portName] : null;
+    const spreadZone = portDef?.spreadZone; // { start, end } in component-local coords
 
     const n    = items.length;
     const w    = placed.width;
     const h    = placed.height;
-    const isHz = dir === 'up' || dir === 'down';   // horizontal edge
-    const span = isHz ? w : h;
-    const step = span / (n + 1);
+    const isHz = dir === 'up' || dir === 'down';
+
+    // Spread within spreadZone if defined, otherwise across the full edge
+    const zoneStart = spreadZone ? spreadZone.start : 0;
+    const zoneSpan  = spreadZone ? (spreadZone.end - spreadZone.start) : (isHz ? w : h);
+    const step      = zoneSpan / (n + 1);
 
     items.forEach(({ wireIdx, endpoint }, idx) => {
-      const offset = Math.round(step * (idx + 1));
+      const offset = Math.round(zoneStart + step * (idx + 1));
       const pos = isHz
         ? { x: placed.x + offset, y: placed.y + (dir === 'down' ? h : 0) }
         : { x: placed.x + (dir === 'right' ? w : 0), y: placed.y + offset };
