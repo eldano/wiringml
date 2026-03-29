@@ -53,9 +53,9 @@ function render(graph, { positions, edges }) {
     rightPanelResult = buildRightPanel(overviews.modules || [], rpX, rpY, overviews);
   }
 
-  const totalW = components.length > 0
+  const totalW = Math.max(800, components.length > 0
     ? xOffset + wiringMaxX + MARGIN
-    : 1000;
+    : 1000);
 
   const NOTE_H    = notes.length ? notes.length * 18 + 12 : 0;
   const totalH = Math.max(
@@ -231,6 +231,15 @@ function buildRightPanel(modules, panelX, panelY, overviews) {
 
 function renderModule(type, x, y) {
   if (type === 'switch-2p') {
+    const offY = y + MOD_H * 0.72;
+    const onY  = y + MOD_H * 0.72;
+    return [
+      `    <rect x="${x}" y="${y}" width="${MOD_W}" height="${MOD_H}" fill="#FFF9E6" stroke="#888" stroke-width="1" rx="2"/>`,
+      `    <circle cx="${x + MOD_W * 0.14}" cy="${offY}" r="3" fill="none" stroke="#444" stroke-width="1.5"/>`,
+      `    <line x1="${x + MOD_W * 0.82}" y1="${onY}" x2="${x + MOD_W * 0.90}" y2="${onY}" stroke="#444" stroke-width="2" stroke-linecap="round"/>`,
+    ].join('\n');
+  }
+  if (type === 'switch-1p3w') {
     const offY = y + MOD_H * 0.72;
     const onY  = y + MOD_H * 0.72;
     return [

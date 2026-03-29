@@ -103,13 +103,41 @@ function connectPoints(sp, tp, fromDir, toDir) {
     }
   }
 
-  // Perpendicular: one bend — choose orientation that doesn't reverse fromDir
-  if (fromDir === 'up' || fromDir === 'down') {
-    const wouldGoBack = (fromDir === 'down' && ty < sy) || (fromDir === 'up' && ty > sy);
-    return wouldGoBack ? [{ x: tx, y: sy }] : [{ x: sx, y: ty }];
+  // Perpendicular: pick the L-shape that doesn't reverse fromDir AND arrives at tp in toDir.
+  // If no single L works, use a Z-shape (2 bends) that routes past tp to approach correctly.
+  {
+    const DETOUR = 40;
+
+    // Direction the wire travels from point a to point b.
+    const segDir = (a, b) => {
+      if (b.x > a.x) return 'right';
+      if (b.x < a.x) return 'left';
+      if (b.y < a.y) return 'up';
+      return 'down';
+    };
+
+    // Two candidate L-shapes
+    const isVert = fromDir === 'up' || fromDir === 'down';
+    const bend1  = isVert ? { x: sx, y: ty } : { x: tx, y: sy }; // fromDir-axis first
+    const bend2  = isVert ? { x: tx, y: sy } : { x: sx, y: ty }; // other axis first
+
+    const lOk = (bend) => {
+      if (wouldReverse(sp, bend, fromDir)) return false;
+      if (!toDir) return true;
+      if (bend.x === tp.x && bend.y === tp.y) return true; // degenerate: bend is already tp
+      return segDir(bend, tp) === toDir;
+    };
+
+    if (lOk(bend1)) return [bend1];
+    if (lOk(bend2)) return [bend2];
+
+    // Neither L works — route past tp so the final approach is in toDir
+    if (!toDir) return [bend1]; // no arrival constraint: best-effort
+    if (toDir === 'left')  return [{ x: tx + DETOUR, y: sy }, { x: tx + DETOUR, y: ty }];
+    if (toDir === 'right') return [{ x: tx - DETOUR, y: sy }, { x: tx - DETOUR, y: ty }];
+    if (toDir === 'up')    return [{ x: sx, y: ty - DETOUR }, { x: tx, y: ty - DETOUR }];
+    /* toDir === 'down' */  return [{ x: sx, y: ty + DETOUR }, { x: tx, y: ty + DETOUR }];
   }
-  const wouldGoBack = (fromDir === 'right' && tx < sx) || (fromDir === 'left' && tx > sx);
-  return wouldGoBack ? [{ x: sx, y: ty }] : [{ x: tx, y: sy }];
 }
 
 /**

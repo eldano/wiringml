@@ -152,6 +152,33 @@ const COMPONENTS = {
     },
   },
 
+  'switch-1p3w': {
+    // 3-way single-pole switch. Like switch-1p but with an extra pin at top center.
+    width: 60,
+    height: 40,
+    ports() {
+      return {
+        left:   { x: 0,  y: 25 },
+        right:  { x: 60, y: 25 },
+        center: { x: 30, y: 0  },
+      };
+    },
+    svg(x, y, _props, id) {
+      return [
+        `<g class="component switch-1p3w">`,
+        `  <rect x="${x}" y="${y}" width="60" height="40" fill="#FFF9E6" stroke="#888" stroke-width="1.5" rx="3"/>`,
+        // Terminal dots
+        `  <circle cx="${x}" cy="${y + 25}" r="3" fill="#555"/>`,
+        `  <circle cx="${x + 60}" cy="${y + 25}" r="3" fill="#555"/>`,
+        `  <circle cx="${x + 30}" cy="${y}" r="3" fill="#555"/>`,
+        // Blade
+        `  <line x1="${x + 8}" y1="${y + 25}" x2="${x + 48}" y2="${y + 19}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <text x="${x + 30}" y="${y + 36}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#888">${id}</text>`,
+        `</g>`,
+      ].join('\n');
+    },
+  },
+
   'switch-2p': {
     // Two-pole switch. Each pole has left/right ports, stacked vertically.
     width: 60,
