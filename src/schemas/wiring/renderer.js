@@ -16,7 +16,7 @@ function panelDims(overviews) {
   return { w: PANEL_W_DEF, h: PANEL_H_DEF };
 }
 
-// Right-panel module dimensions
+// Cover overview module dimensions
 const MOD_W   = 80;
 const MOD_H   = 28;
 const MOD_GAP = 10;
@@ -53,14 +53,14 @@ function render(graph, { positions, edges }) {
     xOffset = panelResult.panelRight + PANEL_GAP;
   }
 
-  // --- Right panel (closed enclosure schematic) — sits below the open casing ---
-  let rightPanelResult = null;
+  // --- Cover overview (closed enclosure schematic) — sits below the open casing ---
+  let coverOverviewResult = null;
   if (overviews?.cover !== undefined) {
     const rpX     = MARGIN;
     const rpY     = (panelResult ? panelResult.panelBottom : MARGIN) + 20;
     const coverType = overviews.cover?.type;
     const modules = coverType === 'coverless' ? [] : (overviews.cover?.modules || []);
-    rightPanelResult = buildRightPanel(modules, rpX, rpY, overviews, coverType);
+    coverOverviewResult = buildCoverOverview(modules, rpX, rpY, overviews, coverType);
   }
 
   const totalW = Math.max(800, components.length > 0
@@ -69,7 +69,7 @@ function render(graph, { positions, edges }) {
 
   const NOTE_H    = notes.length ? notes.length * 18 + 12 : 0;
   const totalH = Math.max(
-    rightPanelResult  ? rightPanelResult.panelBottom  + MARGIN : 0,
+    coverOverviewResult  ? coverOverviewResult.panelBottom  + MARGIN : 0,
     panelResult       ? panelResult.panelBottom       + MARGIN : 0,
     wiringMaxY + MARGIN
   ) + NOTE_H;
@@ -103,7 +103,7 @@ function render(graph, { positions, edges }) {
     `  <rect width="${totalW}" height="${totalH}" fill="#F5F5F5"/>`,
     titleSVG,
     panelResult      ? panelResult.svg      : null,
-    rightPanelResult ? rightPanelResult.svg : null,
+    coverOverviewResult ? coverOverviewResult.svg : null,
     components.length > 0 ? [
       `  <g id="wiring" transform="translate(${xOffset}, 0)">`,
       `    <g id="wires">`,
@@ -205,11 +205,11 @@ function labelPos(wall, cx, cy) {
 }
 
 /**
- * Build the right-side closed-panel schematic.
+ * Build the cover overview schematic — sits below the open casing.
  * Modules are stacked vertically and centred inside the panel rectangle.
  * Supported module types: 'tipo_l' (rectangle + 3 pin holes), 'closed' (blank rectangle).
  */
-function buildRightPanel(modules, panelX, panelY, overviews, coverType) {
+function buildCoverOverview(modules, panelX, panelY, overviews, coverType) {
   const { w: panelW, h: panelH } = panelDims(overviews);
 
   let moduleSVGs = [];
@@ -224,7 +224,7 @@ function buildRightPanel(modules, panelX, panelY, overviews, coverType) {
 
   const fill = (modules.length > 0 || coverType === 'covered') ? '#F5EDD8' : '#555555';
   const svg = [
-    `  <g id="right-panel">`,
+    `  <g id="cover-overview">`,
     `    <rect x="${panelX}" y="${panelY}" width="${panelW}" height="${panelH}" fill="${fill}" stroke="#555" stroke-width="2" rx="4"/>`,
     ...moduleSVGs,
     `  </g>`,

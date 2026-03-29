@@ -1,3 +1,5 @@
+schema: wiring
+
 props:
   title: PCC.W.90
 

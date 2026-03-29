@@ -5,9 +5,7 @@ const http = require('http');
 const fs   = require('fs');
 const path = require('path');
 
-const { parse }  = require('./src/parser');
-const { layout } = require('./src/layout');
-const { render } = require('./src/renderer');
+const { process: processDiagram } = require('./src/index');
 
 const PORT         = 3050;
 const EXAMPLES_DIR = path.join(__dirname, 'examples');
@@ -110,13 +108,16 @@ const SHELL = (names) => `<!DOCTYPE html>
 
     #diagram {
       flex: 1;
+      min-height: 0;
+      position: relative;
       display: none;
     }
 
     #diagram svg {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
-      display: block;
     }
 
     #error {
@@ -207,10 +208,8 @@ const server = http.createServer(async (req, res) => {
   }
 
   try {
-    const source      = fs.readFileSync(filePath, 'utf8');
-    const graph       = parse(source);
-    const layoutResult = await layout(graph);
-    const svg         = render(graph, layoutResult);
+    const source = fs.readFileSync(filePath, 'utf8');
+    const svg    = await processDiagram(source);
     res.writeHead(200, { 'Content-Type': 'image/svg+xml; charset=utf-8' });
     res.end(svg);
   } catch (err) {

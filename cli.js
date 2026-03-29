@@ -4,9 +4,7 @@
 const fs   = require('fs');
 const path = require('path');
 
-const { parse }  = require('./src/parser');
-const { layout } = require('./src/layout');
-const { render } = require('./src/renderer');
+const { process: processDiagram } = require('./src/index');
 
 const [,, inputFile] = process.argv;
 
@@ -16,11 +14,9 @@ if (!inputFile) {
 }
 
 async function main() {
-  const source       = fs.readFileSync(path.resolve(inputFile), 'utf8');
-  const graph        = parse(source);
-  const layoutResult = await layout(graph);
-  const svg          = render(graph, layoutResult);
-  const title        = path.basename(inputFile, path.extname(inputFile));
+  const source = fs.readFileSync(path.resolve(inputFile), 'utf8');
+  const svg    = await processDiagram(source);
+  const title  = path.basename(inputFile, path.extname(inputFile));
 
   const html = `<!DOCTYPE html>
 <html lang="en">
