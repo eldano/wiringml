@@ -230,6 +230,15 @@ function buildRightPanel(modules, panelX, panelY, overviews) {
 }
 
 function renderModule(type, x, y) {
+  if (type === 'switch-2p') {
+    const offY = y + MOD_H * 0.72;
+    const onY  = y + MOD_H * 0.72;
+    return [
+      `    <rect x="${x}" y="${y}" width="${MOD_W}" height="${MOD_H}" fill="#FFF9E6" stroke="#888" stroke-width="1" rx="2"/>`,
+      `    <circle cx="${x + MOD_W * 0.14}" cy="${offY}" r="3" fill="none" stroke="#444" stroke-width="1.5"/>`,
+      `    <line x1="${x + MOD_W * 0.82}" y1="${onY}" x2="${x + MOD_W * 0.90}" y2="${onY}" stroke="#444" stroke-width="2" stroke-linecap="round"/>`,
+    ].join('\n');
+  }
   if (type === 'switch-1p') {
     const offY = y + MOD_H * 0.72; // near bottom — OFF symbol
     const onY  = y + MOD_H * 0.72; // same height — ON symbol

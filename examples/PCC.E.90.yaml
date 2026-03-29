@@ -1,0 +1,80 @@
+props:
+  title: PCC.E.90
+
+notes:
+  - "- Switch top controla 2 luces, la de la entrada bajo techo y las de afuera de la pared del living."
+  - "- Switch bottom controla las 2 luces de la cochera."
+  - "- El ducto izquierdo supongo que va a la pared exterior del living."
+  - "- El ducto derecho supongo que va hacia la luz de la entrada bajo techo y luego sigue hacia la cochera"
+  - "- Faltan los 3 cables grises que van a la consola de la alarma"
+
+overviews:
+  casing:
+    conduit_1: {wall: top, position: left}
+    conduit_2: {wall: top, position: right}
+  modules:
+    - switch-2p
+    - closed
+    - switch-2p
+
+components:
+  conduit_1:
+    type: conduit
+    x: 80
+    y: 30
+  conduit_2:
+    type: conduit
+    x: 180
+    y: 30
+  switch_top:
+    type: switch-2p
+    x: 290
+    y: 160
+  switch_bottom:
+    type: switch-2p
+    x: 290
+    y: 260
+  bornera:
+    type: 2-chan
+    x: 390
+    y: 120
+
+wires:
+  - color: white
+    from: conduit_1.bottom
+    to: switch_top.left.top
+  - color: white
+    from: conduit_1.bottom
+    to: switch_top.left.bottom
+  - color: white
+    from: switch_top.right.top
+    to: bornera.a.bottom
+  - color: white
+    from: switch_top.right.bottom
+    to: bornera.b.bottom
+  - color: white
+    from: switch_bottom.right.top
+    to: bornera.a.bottom
+  - color: white
+    from: switch_bottom.right.bottom
+    to: bornera.b.bottom
+  - color: white
+    from: bornera.a
+    to: conduit_2.bottom
+  - color: white
+    from: bornera.b
+    to: conduit_2.bottom
+
+  - color: white
+    from: conduit_2.bottom
+    to: switch_top.left.top
+  - color: white
+    from: conduit_2.bottom
+    to: switch_top.left.bottom
+
+  - color: white
+    from: conduit_2.bottom
+    to: switch_bottom.left.top
+  - color: white
+    from: conduit_2.bottom
+    to: switch_bottom.left.bottom

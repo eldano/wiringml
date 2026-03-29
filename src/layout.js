@@ -330,13 +330,16 @@ function buildSpreadMap(components, wires, positions) {
     const h    = placed.height;
     const isHz = dir === 'up' || dir === 'down';
 
-    // Spread within spreadZone if defined, otherwise across the full edge
-    const zoneStart = spreadZone ? spreadZone.start : 0;
-    const zoneSpan  = spreadZone ? (spreadZone.end - spreadZone.start) : (isHz ? w : h);
-    const step      = zoneSpan / (n + 1);
+    // Centre the group of wires around the base port coordinate, 10px apart.
+    // If a spreadZone is defined, clamp each position to stay within it.
+    const WIRE_GAP   = 10;
+    const baseCoord  = portDef ? (isHz ? portDef.x : portDef.y) : (isHz ? w / 2 : h / 2);
+    const groupStart = baseCoord - ((n - 1) * WIRE_GAP) / 2;
+    const zoneMin    = spreadZone ? spreadZone.start : 0;
+    const zoneMax    = spreadZone ? spreadZone.end   : (isHz ? w : h);
 
     items.forEach(({ wireIdx, endpoint }, idx) => {
-      const offset = Math.round(zoneStart + step * (idx + 1));
+      const offset = Math.round(Math.max(zoneMin, Math.min(zoneMax, groupStart + idx * WIRE_GAP)));
       const pos = isHz
         ? { x: placed.x + offset, y: placed.y + (dir === 'down' ? h : 0) }
         : { x: placed.x + (dir === 'right' ? w : 0), y: placed.y + offset };

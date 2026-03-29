@@ -152,6 +152,38 @@ const COMPONENTS = {
     },
   },
 
+  'switch-2p': {
+    // Two-pole switch. Each pole has left/right ports, stacked vertically.
+    width: 60,
+    height: 60,
+    ports() {
+      return {
+        'left.top':    { x: 0,  y: 15 },
+        'right.top':   { x: 60, y: 15 },
+        'left.bottom': { x: 0,  y: 45 },
+        'right.bottom':{ x: 60, y: 45 },
+        center:        { x: 30, y: 30 },
+      };
+    },
+    svg(x, y, _props, id) {
+      return [
+        `<g class="component switch-2p">`,
+        `  <rect x="${x}" y="${y}" width="60" height="60" fill="#FFF9E6" stroke="#888" stroke-width="1.5" rx="3"/>`,
+        `  <line x1="${x}" y1="${y + 30}" x2="${x + 60}" y2="${y + 30}" stroke="#CCC" stroke-width="1" stroke-dasharray="3,2"/>`,
+        // Pole 1 terminals + blade
+        `  <circle cx="${x}" cy="${y + 15}" r="3" fill="#555"/>`,
+        `  <circle cx="${x + 60}" cy="${y + 15}" r="3" fill="#555"/>`,
+        `  <line x1="${x + 8}" y1="${y + 15}" x2="${x + 48}" y2="${y + 9}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        // Pole 2 terminals + blade
+        `  <circle cx="${x}" cy="${y + 45}" r="3" fill="#555"/>`,
+        `  <circle cx="${x + 60}" cy="${y + 45}" r="3" fill="#555"/>`,
+        `  <line x1="${x + 8}" y1="${y + 45}" x2="${x + 48}" y2="${y + 39}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <text x="${x + 30}" y="${y + 56}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#888">${id}</text>`,
+        `</g>`,
+      ].join('\n');
+    },
+  },
+
   enclosure: {
     width: 160,
     height: 110,
