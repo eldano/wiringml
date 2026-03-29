@@ -12,11 +12,32 @@ const { render } = require('./src/renderer');
 const PORT         = 3050;
 const EXAMPLES_DIR = path.join(__dirname, 'examples');
 
+function compareNames(a, b) {
+  const partsA = a.split('.');
+  const partsB = b.split('.');
+  const len = Math.max(partsA.length, partsB.length);
+  for (let i = 0; i < len; i++) {
+    const pa = partsA[i] ?? '';
+    const pb = partsB[i] ?? '';
+    if (pa === pb) continue;
+    // Third segment (index 2) uses special ordering: C first, then numeric ascending
+    if (i === 2) {
+      if (pa === 'C') return -1;
+      if (pb === 'C') return  1;
+      const na = Number(pa), nb = Number(pb);
+      if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    }
+    // First and second segments: alphabetical
+    return pa < pb ? -1 : 1;
+  }
+  return 0;
+}
+
 function listExamples() {
   return fs.readdirSync(EXAMPLES_DIR)
     .filter(f => f.endsWith('.yaml'))
     .map(f => f.slice(0, -5))
-    .sort();
+    .sort(compareNames);
 }
 
 const SHELL = (names) => `<!DOCTYPE html>
