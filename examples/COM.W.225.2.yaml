@@ -1,0 +1,45 @@
+props:
+  title: COM.W.225.2
+
+overviews:
+  casing:
+    conduit_1: {wall: left, position: center}
+    conduit_2: {wall: right, position: center}
+  modules:
+    - closed
+    - tipo_l
+    - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 60
+    y: 180
+  conduit_2:
+    type: conduit
+    x: 560
+    y: 180
+  plug:
+    type: tipo_l
+    x: 290
+    y: 260
+
+wires:
+  - color: white
+    from: conduit_1.right
+    to: plug.right.top
+  - color: green
+    from: conduit_1.right
+    to: plug.gnd.top
+  - color: brown
+    from: conduit_1.right
+    to: plug.left.top
+  - color: brown
+    from: plug.left.bottom
+    to: conduit_2.left
+  - color: green
+    from: plug.gnd.bottom
+    to: conduit_2.left
+  - color: white
+    from: plug.right.bottom
+    to: conduit_2.left
