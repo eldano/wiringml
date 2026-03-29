@@ -6,7 +6,15 @@ const MARGIN        = 30;   // outer SVG margin
 const MARKER_R      = 8;    // conduit marker radius on panel
 const PANEL_GAP     = 70;   // gap between panels and wiring diagram
 const PANEL_W_DEF   = 120;  // default panel face width
-const PANEL_H_DEF   = 140;  // default panel face height
+const PANEL_H_DEF   = 160;  // default panel face height (3:4 ratio with width 120)
+
+/** Resolve panel dimensions from the casing type or explicit overrides. */
+function panelDims(overviews) {
+  if (overviews.width && overviews.height) return { w: overviews.width, h: overviews.height };
+  const type = overviews.casing?.type;
+  if (type === '3x4') return { w: 120, h: 160 };
+  return { w: PANEL_W_DEF, h: PANEL_H_DEF };
+}
 
 // Right-panel module dimensions
 const MOD_W   = 80;
@@ -124,10 +132,9 @@ function render(graph, { positions, edges }) {
  * Returns { svg, panelRight, panelBottom, connectorPoints }
  */
 function buildPanel(overviews) {
-  const entries = Object.entries(overviews.casing || {});
+  const entries = Object.entries(overviews.casing || {}).filter(([k]) => k !== 'type');
 
-  const panelW = overviews.width  || PANEL_W_DEF;
-  const panelH = overviews.height || PANEL_H_DEF;
+  const { w: panelW, h: panelH } = panelDims(overviews);
   const panelX = MARGIN;
   const panelY = MARGIN + 20;
 
@@ -201,8 +208,7 @@ function labelPos(wall, cx, cy) {
  * Supported module types: 'tipo_l' (rectangle + 3 pin holes), 'closed' (blank rectangle).
  */
 function buildRightPanel(modules, panelX, panelY, overviews) {
-  const panelW = overviews.width  || PANEL_W_DEF;
-  const panelH = overviews.height || PANEL_H_DEF;
+  const { w: panelW, h: panelH } = panelDims(overviews);
 
   let moduleSVGs = [];
   if (modules.length > 0) {

@@ -270,6 +270,47 @@ const COMPONENTS = {
     },
   },
 
+  '3-chan': {
+    // 3 independent channels (A, B, C) — same overall width as 2-chan, split into thirds.
+    width: 160,
+    height: 30,
+    ports() {
+      const GAP = 6;
+      const W   = 160;
+      const CW  = Math.round(W / 3); // ~53px per channel
+      return {
+        a:          { x: Math.round(CW * 0.5),       y: 0,  spreadZone: { start: GAP,           end: CW - GAP          } },
+        b:          { x: Math.round(CW * 1.5),       y: 0,  spreadZone: { start: CW + GAP,       end: CW * 2 - GAP      } },
+        c:          { x: Math.round(CW * 2.5),       y: 0,  spreadZone: { start: CW * 2 + GAP,   end: W - GAP           } },
+        'a.bottom': { x: Math.round(CW * 0.5),       y: 30, spreadZone: { start: GAP,           end: CW - GAP          } },
+        'b.bottom': { x: Math.round(CW * 1.5),       y: 30, spreadZone: { start: CW + GAP,       end: CW * 2 - GAP      } },
+        'c.bottom': { x: Math.round(CW * 2.5),       y: 30, spreadZone: { start: CW * 2 + GAP,   end: W - GAP           } },
+        center:     { x: 80,                          y: 15 },
+      };
+    },
+    svg(x, y, _props, id) {
+      const H       = 30;
+      const GAP     = 6;
+      const W       = 160;
+      const CW      = Math.round(W / 3);
+      const STRIP_H = 10;
+      const STRIP_Y = y + (H - STRIP_H) / 2;
+      return [
+        `<g class="component 3-chan">`,
+        `  <rect x="${x}" y="${y}" width="${W}" height="${H}" fill="#ECEFF1" stroke="#444" stroke-width="1.5" rx="2"/>`,
+        `  <line x1="${x + CW}" y1="${y}" x2="${x + CW}" y2="${y + H}" stroke="#AAA" stroke-width="1" stroke-dasharray="3,2"/>`,
+        `  <line x1="${x + CW * 2}" y1="${y}" x2="${x + CW * 2}" y2="${y + H}" stroke="#AAA" stroke-width="1" stroke-dasharray="3,2"/>`,
+        `  <rect x="${x + GAP}" y="${STRIP_Y}" width="${CW - GAP * 2}" height="${STRIP_H}" fill="#AAA" stroke="#555" stroke-width="1" rx="2"/>`,
+        `  <rect x="${x + CW + GAP}" y="${STRIP_Y}" width="${CW - GAP * 2}" height="${STRIP_H}" fill="#AAA" stroke="#555" stroke-width="1" rx="2"/>`,
+        `  <rect x="${x + CW * 2 + GAP}" y="${STRIP_Y}" width="${W - CW * 2 - GAP * 2}" height="${STRIP_H}" fill="#AAA" stroke="#555" stroke-width="1" rx="2"/>`,
+        `  <text x="${x + CW * 0.5}" y="${y + H - 4}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#666">A</text>`,
+        `  <text x="${x + CW * 1.5}" y="${y + H - 4}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#666">B</text>`,
+        `  <text x="${x + CW * 2.5}" y="${y + H - 4}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#666">C</text>`,
+        `</g>`,
+      ].join('\n');
+    },
+  },
+
   _unknown: {
     width: 60,
     height: 40,

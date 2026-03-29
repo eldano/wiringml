@@ -6,6 +6,7 @@ notes:
 
 overviews:
   casing:
+    type: 3x4
     conduit_1: {wall: top, position: right}
   modules:
     - closed

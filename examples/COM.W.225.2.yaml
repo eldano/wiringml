@@ -3,6 +3,7 @@ props:
 
 overviews:
   casing:
+    type: 3x4
     conduit_1: {wall: left, position: center}
     conduit_2: {wall: right, position: center}
   modules:
