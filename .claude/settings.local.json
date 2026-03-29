@@ -4,7 +4,8 @@
       "Bash(node cli.js examples/basic.wml)",
       "Bash(open:*)",
       "Bash(node cli.js examples/basic.yaml)",
-      "Bash(node cli.js examples/PCC.E.C.yaml)"
+      "Bash(node cli.js examples/PCC.E.C.yaml)",
+      "Bash(grep:*)"
     ]
   }
 }

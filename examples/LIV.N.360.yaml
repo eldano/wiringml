@@ -9,7 +9,8 @@ notes:
 overviews:
   casing:
     type: 3x4
-  modules:
+  cover:
+    type: coverless
 
 components:
 

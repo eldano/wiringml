@@ -55,10 +55,12 @@ function render(graph, { positions, edges }) {
 
   // --- Right panel (closed enclosure schematic) — sits below the open casing ---
   let rightPanelResult = null;
-  if (overviews?.modules !== undefined) {
-    const rpX = MARGIN;
-    const rpY = (panelResult ? panelResult.panelBottom : MARGIN) + 20;
-    rightPanelResult = buildRightPanel(overviews.modules || [], rpX, rpY, overviews);
+  if (overviews?.cover !== undefined) {
+    const rpX     = MARGIN;
+    const rpY     = (panelResult ? panelResult.panelBottom : MARGIN) + 20;
+    const coverType = overviews.cover?.type;
+    const modules = coverType === 'coverless' ? [] : (overviews.cover?.modules || []);
+    rightPanelResult = buildRightPanel(modules, rpX, rpY, overviews, coverType);
   }
 
   const totalW = Math.max(800, components.length > 0
@@ -207,7 +209,7 @@ function labelPos(wall, cx, cy) {
  * Modules are stacked vertically and centred inside the panel rectangle.
  * Supported module types: 'tipo_l' (rectangle + 3 pin holes), 'closed' (blank rectangle).
  */
-function buildRightPanel(modules, panelX, panelY, overviews) {
+function buildRightPanel(modules, panelX, panelY, overviews, coverType) {
   const { w: panelW, h: panelH } = panelDims(overviews);
 
   let moduleSVGs = [];

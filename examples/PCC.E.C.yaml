@@ -10,10 +10,12 @@ overviews:
     type: 3x4
     conduit_1: {wall: top, position: left}
     conduit_2: {wall: top, position: right}
-  modules:
-    - closed
-    - switch-1p
-    - closed
+  cover:
+    type: modules
+    modules:
+      - closed
+      - switch-1p
+      - closed
 
 components:
   conduit_1:

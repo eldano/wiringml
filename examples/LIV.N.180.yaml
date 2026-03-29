@@ -8,10 +8,12 @@ overviews:
   casing:
     type: 3x4
     conduit_1: {wall: top, position: right}
-  modules:
-    - closed
-    - tipo_l
-    - closed
+  cover:
+    type: modules
+    modules:
+      - closed
+      - tipo_l
+      - closed
 
 components:
   conduit_1:

@@ -10,10 +10,12 @@ overviews:
     conduit_1: {wall: top, position: left}
     conduit_2: {wall: top, position: right}
     conduit_3: {wall: back, position: center}
-  modules:
-    - closed
-    - switch-1p
-    - closed
+  cover:
+    type: modules
+    modules:
+      - closed
+      - switch-1p
+      - closed
 
 components:
   conduit_1:
