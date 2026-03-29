@@ -1,0 +1,46 @@
+props:
+  title: PCC.W.90
+
+overviews:
+  casing:
+    conduit_1: {wall: back, position: center}
+    conduit_2: {wall: bottom, position: left}
+  modules:
+    - closed
+    - switch-1p3w
+    - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 170
+    y: 60
+  conduit_2:
+    type: conduit
+    x: 20
+    y: 300
+  switch_3w:
+    type: switch-1p3w
+    x: 175
+    y: 200
+  bornera:
+    type: 2-chan
+    x: 0
+    y: 130
+
+wires:
+  - color: white
+    from: conduit_2.top
+    to: bornera.a.bottom
+  - color: white
+    from: conduit_2.top
+    to: switch_3w.left
+  - color: white
+    from: conduit_2.top
+    to: switch_3w.right
+  - color: white
+    from: bornera.a
+    to: conduit_1.bottom
+  - color: white
+    from: switch_3w.center
+    to: conduit_1.bottom
