@@ -7,11 +7,7 @@ overviews:
     conduit_1: {wall: left, position: center}
     conduit_2: {wall: left, position: bottom}
   cover:
-    type: modules
-    modules:
-      - closed
-      - closed
-      - closed
+    type: covered
 
 components:
   conduit_1:

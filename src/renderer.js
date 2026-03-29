@@ -222,7 +222,7 @@ function buildRightPanel(modules, panelX, panelY, overviews, coverType) {
     );
   }
 
-  const fill = modules.length > 0 ? '#F5EDD8' : '#555555';
+  const fill = (modules.length > 0 || coverType === 'covered') ? '#F5EDD8' : '#555555';
   const svg = [
     `  <g id="right-panel">`,
     `    <rect x="${panelX}" y="${panelY}" width="${panelW}" height="${panelH}" fill="${fill}" stroke="#555" stroke-width="2" rx="4"/>`,
