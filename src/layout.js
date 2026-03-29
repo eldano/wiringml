@@ -103,9 +103,13 @@ function connectPoints(sp, tp, fromDir, toDir) {
     }
   }
 
-  // Perpendicular: one bend
-  if (fromDir === 'up' || fromDir === 'down') return [{ x: sx, y: ty }];
-  return [{ x: tx, y: sy }];
+  // Perpendicular: one bend — choose orientation that doesn't reverse fromDir
+  if (fromDir === 'up' || fromDir === 'down') {
+    const wouldGoBack = (fromDir === 'down' && ty < sy) || (fromDir === 'up' && ty > sy);
+    return wouldGoBack ? [{ x: tx, y: sy }] : [{ x: sx, y: ty }];
+  }
+  const wouldGoBack = (fromDir === 'right' && tx < sx) || (fromDir === 'left' && tx > sx);
+  return wouldGoBack ? [{ x: sx, y: ty }] : [{ x: tx, y: sy }];
 }
 
 /**

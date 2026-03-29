@@ -171,11 +171,12 @@ function buildPanel(overviews) {
 
 /** Compute absolute (x, y) of a conduit marker given its wall and position. */
 function markerPos(wall, position, panelX, panelY, panelW, panelH) {
+  const inset = MARKER_R + 2;
   switch (wall) {
-    case 'top':    return { x: panelX + panelW * (H_FRAC[position] ?? 0.5), y: panelY };
-    case 'bottom': return { x: panelX + panelW * (H_FRAC[position] ?? 0.5), y: panelY + panelH };
-    case 'left':   return { x: panelX,           y: panelY + panelH * (V_FRAC[position] ?? 0.5) };
-    case 'right':  return { x: panelX + panelW,  y: panelY + panelH * (V_FRAC[position] ?? 0.5) };
+    case 'top':    return { x: panelX + panelW * (H_FRAC[position] ?? 0.5), y: panelY + inset };
+    case 'bottom': return { x: panelX + panelW * (H_FRAC[position] ?? 0.5), y: panelY + panelH - inset };
+    case 'left':   return { x: panelX + inset,          y: panelY + panelH * (V_FRAC[position] ?? 0.5) };
+    case 'right':  return { x: panelX + panelW - inset, y: panelY + panelH * (V_FRAC[position] ?? 0.5) };
     case 'back':
     default:       return { x: panelX + panelW * (H_FRAC[position] ?? 0.5),
                              y: panelY + panelH * (V_FRAC[position] ?? 0.5) };
