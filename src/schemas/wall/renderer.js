@@ -2,6 +2,9 @@
 
 const MARGIN     = 40;   // outer SVG margin in px
 const TARGET_W   = 800;  // target drawable width in px (dims are scaled to fit)
+const STROKE     = '#111';
+const SW_WALL    = 1;
+const SW_OPENING = 1;
 
 // Physical dimensions of fixture types in meters
 const FIXTURE_DIMS = {
@@ -67,16 +70,16 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
   // Left wall, ceiling, right wall as a single open path
   const outlinePath = `M ${x0},${y0} L ${x3},${y3} L ${x2},${y2} L ${x1},${y1}`;
 
-  // Windows: filled grey rectangles
+  // Windows: unfilled rectangles
   const windowSVG = windows.map(w =>
-    `  <rect x="${w.x}" y="${w.y}" width="${w.w}" height="${w.h}" fill="none" stroke="#888" stroke-width="2"/>`
+    `  <rect x="${w.x}" y="${w.y}" width="${w.w}" height="${w.h}" fill="none" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`
   ).join('\n');
 
   // Door frames: left edge, top lintel, right edge
   const doorSVG = doors.map(d => [
-    `  <line x1="${d.x}"      y1="${floorY}"      x2="${d.x}"      y2="${floorY - d.h}" stroke="#888" stroke-width="2"/>`,
-    `  <line x1="${d.x}"      y1="${floorY - d.h}" x2="${d.x + d.w}" y2="${floorY - d.h}" stroke="#888" stroke-width="2"/>`,
-    `  <line x1="${d.x + d.w}" y1="${floorY - d.h}" x2="${d.x + d.w}" y2="${floorY}"      stroke="#888" stroke-width="2"/>`,
+    `  <line x1="${d.x}"       y1="${floorY}"       x2="${d.x}"       y2="${floorY - d.h}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+    `  <line x1="${d.x}"       y1="${floorY - d.h}" x2="${d.x + d.w}" y2="${floorY - d.h}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+    `  <line x1="${d.x + d.w}" y1="${floorY - d.h}" x2="${d.x + d.w}" y2="${floorY}"       stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
   ].join('\n')).join('\n');
 
   // Fixtures
@@ -89,7 +92,7 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
       ? x1 - Math.round((f.position.offset + dims.w) * scale)
       : x0 + Math.round(f.position.offset * scale);
     const fy = floorY - Math.round(f.position.height * scale) - fh;
-    const rect = `    <rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" fill="#F5EDD8" stroke="#111" stroke-width="1.5"/>`;
+    const rect = `    <rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" fill="#F5EDD8" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`;
     if (f.link) {
       return `  <a href="#${f.link}" style="cursor:pointer">\n${rect}\n  </a>`;
     }
@@ -100,8 +103,8 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${totalW} ${totalH}">`,
     `  <rect width="${totalW}" height="${totalH}" fill="#F5F5F5"/>`,
-    `  <path d="${outlinePath}" fill="none" stroke="#111" stroke-width="2" stroke-linejoin="miter"/>`,
-    floorPath ? `  <path d="${floorPath}" fill="none" stroke="#111" stroke-width="2"/>` : '',
+    `  <path d="${outlinePath}" fill="none" stroke="${STROKE}" stroke-width="${SW_WALL}" stroke-linejoin="miter"/>`,
+    floorPath ? `  <path d="${floorPath}" fill="none" stroke="${STROKE}" stroke-width="${SW_WALL}"/>` : '',
     windowSVG,
     doorSVG,
     fixtureSVG,
