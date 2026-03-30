@@ -27,7 +27,7 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
   const x2 = MARGIN + W, y2 = floorY - RH;      // top-right
   const x3 = MARGIN,     y3 = floorY - LH;      // top-left
 
-  // Compute door openings in pixel space (only type=door for now)
+  // Compute openings in pixel space
   const doors = openings
     .filter(o => o.type === 'door')
     .map(o => {
@@ -37,6 +37,18 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
         ? x1 - Math.round((o.position.offset + o.width) * scale)
         : x0 + Math.round(o.position.offset * scale);
       return { x: dX, w: dW, h: dH };
+    });
+
+  const windows = openings
+    .filter(o => o.type === 'window')
+    .map(o => {
+      const wW = Math.round(o.width  * scale);
+      const wH = Math.round(o.height * scale);
+      const wX = o.position.from === 'right'
+        ? x1 - Math.round((o.position.offset + o.width) * scale)
+        : x0 + Math.round(o.position.offset * scale);
+      const wY = floorY - Math.round(o.position.height * scale) - wH; // top-left y
+      return { x: wX, y: wY, w: wW, h: wH };
     });
 
   // Build wall outline as a path, breaking the floor line at each door gap
@@ -54,6 +66,11 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
 
   // Left wall, ceiling, right wall as a single open path
   const outlinePath = `M ${x0},${y0} L ${x3},${y3} L ${x2},${y2} L ${x1},${y1}`;
+
+  // Windows: filled grey rectangles
+  const windowSVG = windows.map(w =>
+    `  <rect x="${w.x}" y="${w.y}" width="${w.w}" height="${w.h}" fill="none" stroke="#888" stroke-width="2"/>`
+  ).join('\n');
 
   // Door frames: left edge, top lintel, right edge
   const doorSVG = doors.map(d => [
@@ -85,6 +102,7 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
     `  <rect width="${totalW}" height="${totalH}" fill="#F5F5F5"/>`,
     `  <path d="${outlinePath}" fill="none" stroke="#111" stroke-width="2" stroke-linejoin="miter"/>`,
     floorPath ? `  <path d="${floorPath}" fill="none" stroke="#111" stroke-width="2"/>` : '',
+    windowSVG,
     doorSVG,
     fixtureSVG,
     `</svg>`,
