@@ -1,23 +1,23 @@
 schema: wall
 
 dims:
-  width: 6
-  left_height: 4
-  right_height: 5
+  width: 4.96
+  left_height: 2.76
+  right_height: 3.63
 
 openings:
   - door:
     type: door
-    width: 0.75
-    height: 2.1
-    position: {from: left, offset: 5}
+    width: 0.76
+    height: 2.06
+    position: {from: left, offset: 3.95}
 
 fixtures:
   - switch:
     type: plaqueta
     link: LIV.N.90
-    position: {from: left, offset: 4, height: 1.2}
+    position: {from: left, offset: 3.58, height: 1.08}
   - outlet:
     type: plaqueta
     link: LIV.N.180
-    position: {from: left, offset: 3, height: 0.4}
+    position: {from: left, offset: 2.43, height: 0.36}
