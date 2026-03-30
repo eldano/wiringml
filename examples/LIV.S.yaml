@@ -1,5 +1,13 @@
 schema: wall
 
+status:
+  complete: false
+  missing:
+    - "⚠️ Medir la ventana correctamente y la distancia del outlet"
+    - "Permitir posicionar fixtures y puertas y ventanas desde la derecha también"
+    - "Mejorar la representación de la ventana, tener subtipos para ventanas, cada uno con su propia representación."
+    - "Cambiar 'dims' por 'main' para poder representar la pared principal y luego otras extensiones como las columnas de piedra"
+
 dims:
   width: 4.96
   left_height: 3.63

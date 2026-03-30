@@ -5,6 +5,11 @@ dims:
   left_height: 2.76
   right_height: 3.63
 
+status:
+  complete: false
+  missing:
+    - "⚠️ Agregar agujero donde sale la luz y posiblemente otros cables, relevar esto."
+
 openings:
   - door:
     type: door
