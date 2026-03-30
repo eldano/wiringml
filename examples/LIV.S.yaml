@@ -1,0 +1,19 @@
+schema: wall
+
+dims:
+  width: 6
+  left_height: 5
+  right_height: 4
+
+openings:
+  - window:
+    type: window
+    width: 1.8
+    height: 1.5
+    position: {from: left, offset: 2, height: 0.8}
+
+fixtures:
+  - outlet:
+    type: plaqueta
+    link: LIV.S.135
+    position: {from: left, offset: 4.3, height: 0.4}
