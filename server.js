@@ -133,7 +133,10 @@ const SHELL = (names) => `<!DOCTYPE html>
     <nav id="sidebar">
       <h2>Examples</h2>
       <ul>
-        ${names.map(n => `<li><a href="#${n}" data-name="${n}">${n}</a></li>`).join('\n        ')}
+        ${names.map(n => {
+          const indent = n.split('.').length > 2 ? ' style="padding-left:1.2rem"' : '';
+          return `<li><a href="#${n}" data-name="${n}"${indent}>${n}</a></li>`;
+        }).join('\n        ')}
       </ul>
     </nav>
     <main id="main">
