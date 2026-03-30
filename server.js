@@ -173,9 +173,14 @@ const SHELL = (names) => `<!DOCTYPE html>
       load(a.dataset.name);
     });
 
-    // Load from URL hash on first visit
+    // Load from URL hash on first visit and on hash changes
     const initial = location.hash.slice(1);
     if (initial) load(initial);
+
+    window.addEventListener('hashchange', () => {
+      const name = location.hash.slice(1);
+      if (name) load(name);
+    });
   </script>
 </body>
 </html>`;

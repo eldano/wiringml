@@ -71,8 +71,12 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
     const fx = f.position.from === 'right'
       ? x1 - Math.round((f.position.offset + dims.w) * scale)
       : x0 + Math.round(f.position.offset * scale);
-    const fy = floorY - Math.round(f.position.height * scale) - fh; // top-left y (SVG coords)
-    return `  <rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" fill="#F5EDD8" stroke="#111" stroke-width="1.5"/>`;
+    const fy = floorY - Math.round(f.position.height * scale) - fh;
+    const rect = `    <rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" fill="#F5EDD8" stroke="#111" stroke-width="1.5"/>`;
+    if (f.link) {
+      return `  <a href="#${f.link}" style="cursor:pointer">\n${rect}\n  </a>`;
+    }
+    return rect;
   }).filter(Boolean).join('\n');
 
   return [
