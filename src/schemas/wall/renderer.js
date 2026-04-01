@@ -1,10 +1,12 @@
 'use strict';
 
-const MARGIN     = 40;   // outer SVG margin in px
-const TARGET_W   = 800;  // target drawable width in px (dims are scaled to fit)
-const STROKE     = '#111';
-const SW_WALL    = 1;
-const SW_OPENING = 1;
+const MARGIN        = 40;    // outer SVG margin in px
+const TARGET_W      = 800;   // target drawable width in px (dims are scaled to fit)
+const STROKE        = '#111';
+const SW_WALL       = 1;
+const SW_OPENING    = 1;
+const DOOR_FRAME_M  = 0.04;  // door frame width in meters (4 cm)
+const DOOR_FRAME_FILL = '#DDD0B0';
 
 // Physical dimensions of fixture types in meters
 const FIXTURE_DIMS = {
@@ -70,17 +72,35 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
   // Left wall, ceiling, right wall as a single open path
   const outlinePath = `M ${x0},${y0} L ${x3},${y3} L ${x2},${y2} L ${x1},${y1}`;
 
-  // Windows: unfilled rectangles
-  const windowSVG = windows.map(w =>
-    `  <rect x="${w.x}" y="${w.y}" width="${w.w}" height="${w.h}" fill="none" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`
-  ).join('\n');
+  // Windows: frame (4 sides) + outer stroke
+  const windowSVG = windows.map(w => {
+    const fw = Math.round(DOOR_FRAME_M * scale);
+    return [
+      // Filled frame pieces
+      `  <rect x="${w.x}"             y="${w.y}"             width="${w.w}" height="${fw}"  fill="${DOOR_FRAME_FILL}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+      `  <rect x="${w.x}"             y="${w.y + w.h - fw}"  width="${w.w}" height="${fw}"  fill="${DOOR_FRAME_FILL}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+      `  <rect x="${w.x}"             y="${w.y + fw}"         width="${fw}"  height="${w.h - 2 * fw}" fill="${DOOR_FRAME_FILL}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+      `  <rect x="${w.x + w.w - fw}"  y="${w.y + fw}"         width="${fw}"  height="${w.h - 2 * fw}" fill="${DOOR_FRAME_FILL}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+      // Outer stroke rect on top
+      `  <rect x="${w.x}" y="${w.y}" width="${w.w}" height="${w.h}" fill="none" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+    ].join('\n');
+  }).join('\n');
 
-  // Door frames: left edge, top lintel, right edge
-  const doorSVG = doors.map(d => [
-    `  <line x1="${d.x}"       y1="${floorY}"       x2="${d.x}"       y2="${floorY - d.h}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
-    `  <line x1="${d.x}"       y1="${floorY - d.h}" x2="${d.x + d.w}" y2="${floorY - d.h}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
-    `  <line x1="${d.x + d.w}" y1="${floorY - d.h}" x2="${d.x + d.w}" y2="${floorY}"       stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
-  ].join('\n')).join('\n');
+  // Door frames: outer opening lines + inner frame (jambs + header)
+  const doorSVG = doors.map(d => {
+    const fw = Math.round(DOOR_FRAME_M * scale); // frame width in px
+    const top = floorY - d.h;
+    return [
+      // Filled frame pieces (drawn first so outer lines sit on top)
+      `  <rect x="${d.x}"             y="${top}" width="${fw}"      height="${d.h}" fill="${DOOR_FRAME_FILL}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+      `  <rect x="${d.x + d.w - fw}"  y="${top}" width="${fw}"      height="${d.h}" fill="${DOOR_FRAME_FILL}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+      `  <rect x="${d.x}"             y="${top}" width="${d.w}"      height="${fw}"  fill="${DOOR_FRAME_FILL}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+      // Outer opening edges (crisp lines over the rects)
+      `  <line x1="${d.x}"       y1="${floorY}" x2="${d.x}"       y2="${top}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+      `  <line x1="${d.x}"       y1="${top}"    x2="${d.x + d.w}" y2="${top}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+      `  <line x1="${d.x + d.w}" y1="${top}"    x2="${d.x + d.w}" y2="${floorY}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+    ].join('\n');
+  }).join('\n');
 
   // Fixtures
   const fixtureSVG = fixtures.map(f => {
