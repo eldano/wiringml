@@ -1,0 +1,30 @@
+schema: wall
+
+dims:
+  width: 3.43
+  left_height: 3.24
+  right_height: 2.72
+
+status:
+  complete: false
+  missing:
+    - "Agregar perfil ropero"
+    - "Agregar luz de pared"
+    - "Agregar nuevo tipo de outlet externo (conecta modem)"
+
+openings:
+  - door:
+    type: door
+    width: 0.76
+    height: 2.05
+    position: {from: left, offset: 1.75}
+
+fixtures:
+  - outlet:
+    type: plaqueta
+    link: OFI.N.225
+    position: {from: left, offset: 0.04, height: 0.25}
+  - switch:
+    type: plaqueta
+    link: OFI.N.90
+    position: {from: left, offset: 2.69, height: 1.07}
