@@ -11,6 +11,7 @@ status:
     - "Agregar perfil ropero"
     - "Agregar luz de pared"
     - "Agregar nuevo tipo de outlet externo (conecta modem)"
+    - "Agregar sensor, central de alarma y panel de térmicas"
 
 openings:
   - door:
