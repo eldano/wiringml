@@ -127,7 +127,6 @@ const COMPONENTS = {
 
   'switch-1p': {
     // Single-pole switch. Ports: left and right on the horizontal centre axis.
-    // Temporary symbol: rectangle with terminal dots and an angled blade line.
     width: 60,
     height: 30,
     ports() {
@@ -141,12 +140,18 @@ const COMPONENTS = {
       return [
         `<g class="component switch-1p">`,
         `  <rect x="${x}" y="${y}" width="60" height="30" fill="#FFF9E6" stroke="#888" stroke-width="1.5" rx="3"/>`,
-        // Terminal dots
+        // Port connection dots
         `  <circle cx="${x}" cy="${y + 15}" r="3" fill="#555"/>`,
         `  <circle cx="${x + 60}" cy="${y + 15}" r="3" fill="#555"/>`,
-        // Blade (angled line suggesting open switch contact)
-        `  <line x1="${x + 8}" y1="${y + 15}" x2="${x + 48}" y2="${y + 9}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
-        `  <text x="${x + 30}" y="${y + 26}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#888">${id}</text>`,
+        // Left stub and pivot contact
+        `  <line x1="${x + 2}" y1="${y + 15}" x2="${x + 17}" y2="${y + 15}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <circle cx="${x + 17}" cy="${y + 15}" r="2.5" fill="#555"/>`,
+        // Blade (angled open position)
+        `  <line x1="${x + 17}" y1="${y + 15}" x2="${x + 43}" y2="${y + 8}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        // Right contact and stub
+        `  <circle cx="${x + 43}" cy="${y + 15}" r="2.5" fill="#555"/>`,
+        `  <line x1="${x + 43}" y1="${y + 15}" x2="${x + 58}" y2="${y + 15}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <text x="${x + 30}" y="${y + 27}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#888">${id}</text>`,
         `</g>`,
       ].join('\n');
     },
@@ -167,13 +172,22 @@ const COMPONENTS = {
       return [
         `<g class="component switch-1p3w">`,
         `  <rect x="${x}" y="${y}" width="60" height="40" fill="#FFF9E6" stroke="#888" stroke-width="1.5" rx="3"/>`,
-        // Terminal dots
+        // Port connection dots
         `  <circle cx="${x}" cy="${y + 25}" r="3" fill="#555"/>`,
         `  <circle cx="${x + 60}" cy="${y + 25}" r="3" fill="#555"/>`,
         `  <circle cx="${x + 30}" cy="${y}" r="3" fill="#555"/>`,
-        // Blade
-        `  <line x1="${x + 8}" y1="${y + 25}" x2="${x + 48}" y2="${y + 19}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
-        `  <text x="${x + 30}" y="${y + 36}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#888">${id}</text>`,
+        // Center (top) port stub
+        `  <line x1="${x + 30}" y1="${y + 2}" x2="${x + 30}" y2="${y + 11}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <circle cx="${x + 30}" cy="${y + 11}" r="2.5" fill="#555"/>`,
+        // Left stub and pivot contact
+        `  <line x1="${x + 2}" y1="${y + 25}" x2="${x + 17}" y2="${y + 25}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <circle cx="${x + 17}" cy="${y + 25}" r="2.5" fill="#555"/>`,
+        // Blade (angled open position, pointing toward center contact)
+        `  <line x1="${x + 17}" y1="${y + 25}" x2="${x + 43}" y2="${y + 18}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        // Right contact and stub
+        `  <circle cx="${x + 43}" cy="${y + 25}" r="2.5" fill="#555"/>`,
+        `  <line x1="${x + 43}" y1="${y + 25}" x2="${x + 58}" y2="${y + 25}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <text x="${x + 30}" y="${y + 37}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#888">${id}</text>`,
         `</g>`,
       ].join('\n');
     },
@@ -197,14 +211,24 @@ const COMPONENTS = {
         `<g class="component switch-2p">`,
         `  <rect x="${x}" y="${y}" width="60" height="60" fill="#FFF9E6" stroke="#888" stroke-width="1.5" rx="3"/>`,
         `  <line x1="${x}" y1="${y + 30}" x2="${x + 60}" y2="${y + 30}" stroke="#CCC" stroke-width="1" stroke-dasharray="3,2"/>`,
-        // Pole 1 terminals + blade
+        // Mechanical link between blades (ganged)
+        `  <line x1="${x + 30}" y1="${y + 12}" x2="${x + 30}" y2="${y + 42}" stroke="#AAA" stroke-width="1" stroke-dasharray="2,2"/>`,
+        // Pole 1: port dots, stub, pivot, blade, contact, stub
         `  <circle cx="${x}" cy="${y + 15}" r="3" fill="#555"/>`,
         `  <circle cx="${x + 60}" cy="${y + 15}" r="3" fill="#555"/>`,
-        `  <line x1="${x + 8}" y1="${y + 15}" x2="${x + 48}" y2="${y + 9}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
-        // Pole 2 terminals + blade
+        `  <line x1="${x + 2}" y1="${y + 15}" x2="${x + 17}" y2="${y + 15}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <circle cx="${x + 17}" cy="${y + 15}" r="2.5" fill="#555"/>`,
+        `  <line x1="${x + 17}" y1="${y + 15}" x2="${x + 43}" y2="${y + 8}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <circle cx="${x + 43}" cy="${y + 15}" r="2.5" fill="#555"/>`,
+        `  <line x1="${x + 43}" y1="${y + 15}" x2="${x + 58}" y2="${y + 15}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        // Pole 2: port dots, stub, pivot, blade, contact, stub
         `  <circle cx="${x}" cy="${y + 45}" r="3" fill="#555"/>`,
         `  <circle cx="${x + 60}" cy="${y + 45}" r="3" fill="#555"/>`,
-        `  <line x1="${x + 8}" y1="${y + 45}" x2="${x + 48}" y2="${y + 39}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <line x1="${x + 2}" y1="${y + 45}" x2="${x + 17}" y2="${y + 45}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <circle cx="${x + 17}" cy="${y + 45}" r="2.5" fill="#555"/>`,
+        `  <line x1="${x + 17}" y1="${y + 45}" x2="${x + 43}" y2="${y + 38}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  <circle cx="${x + 43}" cy="${y + 45}" r="2.5" fill="#555"/>`,
+        `  <line x1="${x + 43}" y1="${y + 45}" x2="${x + 58}" y2="${y + 45}" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>`,
         `  <text x="${x + 30}" y="${y + 56}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#888">${id}</text>`,
         `</g>`,
       ].join('\n');
