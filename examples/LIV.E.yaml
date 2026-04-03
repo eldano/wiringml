@@ -1,0 +1,24 @@
+schema: wall
+
+dims:
+  width: 3.50
+  left_height: 3.63
+  right_height: 3.63
+
+status:
+  complete: false
+  missing:
+    - "Agregar distancias de plaqueta de detrás del rack"
+
+openings:
+  - door:
+    type: door
+    width: 0.89
+    height: 2.06
+    position: {from: left, offset: 0.26}
+
+fixtures:
+  - outlet:
+    type: plaqueta
+    link: LIV.E.135
+    position: {from: right, offset: 0.75, height: 0.36}
