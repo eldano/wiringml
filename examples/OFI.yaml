@@ -1,0 +1,18 @@
+schema: room
+title: Office
+
+width: 3.43
+depth: 3.47
+
+walls:
+  north:
+    openings:
+      - type: door
+        position: {from: left, offset: 1.75}
+        width: 0.76
+        swing: {pivot: left, direction: cw}
+  south:
+    openings:
+      - type: window
+        position: {from: left, offset: 0.81}
+        width: 1.8
