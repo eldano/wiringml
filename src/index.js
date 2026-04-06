@@ -5,16 +5,19 @@ const yaml = require('js-yaml');
 const SCHEMAS = {
   wiring: require('./schemas/wiring/parser'),
   wall:   require('./schemas/wall/parser'),
+  room:   require('./schemas/room/parser'),
 };
 
 const LAYOUTS = {
   wiring: require('./schemas/wiring/layout'),
   wall:   require('./schemas/wall/layout'),
+  room:   require('./schemas/room/layout'),
 };
 
 const RENDERERS = {
   wiring: require('./schemas/wiring/renderer'),
   wall:   require('./schemas/wall/renderer'),
+  room:   require('./schemas/room/renderer'),
 };
 
 /**
