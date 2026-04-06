@@ -174,8 +174,11 @@ function render({ title, width, depth, walls }, _layout) {
     for (const [a, b] of subtractGaps(W, gaps)) {
       segs.push(`<line x1="${fromX+a}" y1="${yInner}" x2="${fromX+b}" y2="${yInner}" ${strokeAttr}/>`);
     }
-    // No vertical caps: they would be collinear with the east/west inner faces,
-    // making those lines appear to extend into the outer walls.
+    // Jamb lines at each opening edge (outer face to inner face)
+    for (const g of gaps) {
+      segs.push(`<line x1="${fromX+g.start}" y1="${yOuter}" x2="${fromX+g.start}" y2="${yInner}" ${strokeAttr}/>`);
+      segs.push(`<line x1="${fromX+g.end}"   y1="${yOuter}" x2="${fromX+g.end}"   y2="${yInner}" ${strokeAttr}/>`);
+    }
     return segs.join('\n  ');
   }
 
@@ -189,8 +192,11 @@ function render({ title, width, depth, walls }, _layout) {
     for (const [a, b] of subtractGaps(H, gaps)) {
       segs.push(`<line x1="${xInner}" y1="${fromY+a}" x2="${xInner}" y2="${fromY+b}" ${strokeAttr}/>`);
     }
-    // No horizontal caps: they would be collinear with the north/south inner faces,
-    // making those lines appear to extend into the outer walls.
+    // Jamb lines at each opening edge (outer face to inner face)
+    for (const g of gaps) {
+      segs.push(`<line x1="${xOuter}" y1="${fromY+g.start}" x2="${xInner}" y2="${fromY+g.start}" ${strokeAttr}/>`);
+      segs.push(`<line x1="${xOuter}" y1="${fromY+g.end}"   x2="${xInner}" y2="${fromY+g.end}"   ${strokeAttr}/>`);
+    }
     return segs.join('\n  ');
   }
 
