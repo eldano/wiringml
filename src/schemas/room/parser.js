@@ -21,7 +21,7 @@ function parse(source) {
         throw new Error(`room: opening on ${side} wall missing "position" (needs "from" and "offset")`);
       if (typeof o.width !== 'number') throw new Error(`room: opening on ${side} wall missing "width"`);
       const swing = o.swing
-        ? { pivot: o.swing.pivot, direction: o.swing.direction }
+        ? { direction: o.swing.direction, opens: o.swing.opens }
         : null;
       return { type: o.type, position: { from: o.position.from, offset: o.position.offset }, width: o.width, swing };
     }) : [];

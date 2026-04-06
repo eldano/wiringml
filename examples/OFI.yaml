@@ -10,7 +10,7 @@ walls:
       - type: door
         position: {from: left, offset: 1.75}
         width: 0.76
-        swing: {pivot: left, direction: cw}
+        swing: {direction: cw, opens: in}
   south:
     openings:
       - type: window
