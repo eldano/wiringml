@@ -186,7 +186,8 @@ const SHELL = (examples) => `<!DOCTYPE html>
       <h2>Examples</h2>
       <ul>
         ${examples.map(({ name, status }) => {
-          const indent = name.split('.').length > 2 ? ' style="padding-left:1.2rem"' : '';
+          const parts = name.split('.').length;
+          const indent = parts === 2 ? ' style="padding-left:1rem"' : parts >= 3 ? ' style="padding-left:2rem"' : '';
           const dotClass = !status ? 'none' : status.complete ? 'complete' : 'incomplete';
           return `<li><a href="#${name}" data-name="${name}"${indent}><span class="status-dot ${dotClass}"></span>${name}</a></li>`;
         }).join('\n        ')}
