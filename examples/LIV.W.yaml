@@ -1,0 +1,19 @@
+schema: wall
+
+dims:
+  width: 3.50
+  left_height: 2.76
+  right_height: 2.76
+
+status:
+  complete: false
+  missing:
+    - "Agregar la plaqueta, el coso del coaxial y el sensor de la alarma"
+
+openings:
+
+fixtures:
+  - outlet:
+    type: plaqueta
+    link: LIV.W.180
+    position: {from: left, offset: 1.70, height: 0.36}
