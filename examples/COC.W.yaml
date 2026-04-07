@@ -1,0 +1,31 @@
+schema: wall
+
+dims:
+  width: 3.28
+  left_height: 2.38
+  right_height: 2.38
+
+status:
+  complete: false
+  missing:
+    - "Agregar plaquetas (horno, campana, lavavajillas)"
+
+openings:
+  - door:
+    type: door
+    width: 0.83
+    height: 2.05
+    position: {from: right, offset: 0.05}
+
+  - window:
+    type: window
+    width: 1.51
+    height: 0.90
+    position: {from: left, offset: 0.04, height: 1.17}
+
+fixtures:
+  - outlet_temporal:
+    type: plaqueta
+    link: LIV.E.135
+    notes: "notes to be written here"
+    position: {from: right, offset: 1.25, height: 0.36}
