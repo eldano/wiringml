@@ -1,0 +1,21 @@
+schema: room
+title: Kitchen
+
+walls:
+  east:
+    length: 1.72
+  south:
+    length: 2.59
+  west:
+    length: 3.28
+    openings:
+      - door:
+        type: door
+        position: {from: top, offset: 0.05}
+        width: 0.83
+        swing: {direction: cw, opens: in}
+
+      - window:
+        type: window
+        width: 1.51
+        position: {from: bottom, offset: 0.04}
