@@ -27,37 +27,62 @@ function subtractGaps(length, gaps) {
   return result;
 }
 
-function render({ title, width, depth, walls }, _layout) {
+function render({ title, walls }, _layout) {
+  const nWall = walls.north, sWall = walls.south;
+  const eWall = walls.east,  wWall = walls.west;
+
+  // Bounding box: width from any horizontal wall; depth = max of vertical wall lengths.
+  const width = (nWall || sWall).length;
+  const depth = Math.max(eWall ? eWall.length : 0, wWall ? wWall.length : 0) || width;
+
   const scale = (TARGET_W - MARGIN * 2) / width;
-  const W = width  * scale;
-  const H = depth  * scale;
-  const T = Math.round(WALL_T * scale);   // wall thickness in pixels
+  const W  = width * scale;
+  const H  = depth * scale;
+  const T  = Math.round(WALL_T * scale);
 
-  // --- Resolve openings to pixel gaps in room-relative space (interior NW = 0,0) ---
+  // Each vertical wall has its own height (may be less than H).
+  const E_h  = eWall ? eWall.length * scale : 0;
+  const Ww_h = wWall ? wWall.length * scale : 0;
 
-  function resolveStart(o, wallLength) {
+  // Anchor: if north is present (or no south), the wall hangs from the top (y=0).
+  // If north is absent but south is present, it anchors at the bottom (y=H).
+  const eTopAnchored = !!(nWall || !sWall);
+  const wTopAnchored = !!(nWall || !sWall);
+  const eTopY = eTopAnchored ? 0 : H - E_h;
+  const wTopY = wTopAnchored ? 0 : H - Ww_h;
+
+  // Corner connectivity: a corner exists only where two adjacent walls meet.
+  const hasNW = !!(nWall && wWall);
+  const hasNE = !!(nWall && eWall);
+  const hasSE = !!(eWall && sWall && Math.round(eTopY + E_h)  >= Math.round(H));
+  const hasSW = !!(wWall && sWall && Math.round(wTopY + Ww_h) >= Math.round(H));
+
+  // --- Resolve openings to pixel gaps in wall-relative space (wall start = 0) ---
+
+  function resolveStart(o, wallLen) {
     const { from, offset } = o.position;
     return (from === 'left' || from === 'top')
       ? offset * scale
-      : wallLength - (offset + o.width) * scale;
+      : wallLen - (offset + o.width) * scale;
   }
 
-  function wallGaps(side) {
-    const wallLength = (side === 'north' || side === 'south') ? W : H;
-    return (walls[side].openings || []).map(o => {
-      const start = resolveStart(o, wallLength);
+  function wallGaps(wall, wallLen) {
+    if (!wall) return [];
+    return wall.openings.map(o => {
+      const start = resolveStart(o, wallLen);
       return { ...o, start, end: start + o.width * scale };
     });
   }
 
-  const northGaps = wallGaps('north');
-  const southGaps = wallGaps('south');
-  const eastGaps  = wallGaps('east');
-  const westGaps  = wallGaps('west');
+  const northGaps = wallGaps(nWall, W);
+  const southGaps = wallGaps(sWall, W);
+  const eastGaps  = wallGaps(eWall, E_h);
+  const westGaps  = wallGaps(wWall, Ww_h);
 
-  // --- Compute door arc geometry in room-relative space ---
+  // --- Compute door arc geometry in room-relative space (interior NW = 0,0) ---
 
-  function computeDoorArcs(gaps, side) {
+  // wallOffset: room-relative y of the wall's start (for bottom-anchored V walls, > 0).
+  function computeDoorArcs(gaps, side, wallOffset = 0) {
     const isH = side === 'north' || side === 'south';
 
     const faces = {
@@ -67,7 +92,6 @@ function render({ title, width, depth, walls }, _layout) {
       west:  { inner: 0,   outer: -T   },
     }[side];
 
-    // Sign of the perpendicular direction pointing toward the room interior
     const roomSign = { north: 1, south: -1, east: -1, west: 1 }[side];
 
     return gaps.filter(g => g.type === 'door').map(g => {
@@ -82,16 +106,14 @@ function render({ title, width, depth, walls }, _layout) {
       let px, py, tx, ty, ex, ey;
 
       if (isH) {
-        // north: pivotLeft when (cw===inward); south flips it
         const pivotLeft = (isCW === isInward) !== (side === 'south');
         px = pivotLeft ? g.start : g.end;   py = face;
         tx = pivotLeft ? g.end   : g.start; ty = face;
         ex = px; ey = face + arcDisp;
       } else {
-        // east: pivotTop when (cw===inward); west flips it
         const pivotTop = (isCW === isInward) !== (side === 'west');
-        py = pivotTop ? g.start : g.end;   px = face;
-        ty = pivotTop ? g.end   : g.start; tx = face;
+        py = (pivotTop ? g.start : g.end)   + wallOffset; px = face;
+        ty = (pivotTop ? g.end   : g.start) + wallOffset; tx = face;
         ey = py; ex = face + arcDisp;
       }
 
@@ -102,79 +124,79 @@ function render({ title, width, depth, walls }, _layout) {
   const allDoorArcs = {
     north: computeDoorArcs(northGaps, 'north'),
     south: computeDoorArcs(southGaps, 'south'),
-    east:  computeDoorArcs(eastGaps,  'east'),
-    west:  computeDoorArcs(westGaps,  'west'),
+    east:  computeDoorArcs(eastGaps,  'east',  eTopY),
+    west:  computeDoorArcs(westGaps,  'west',  wTopY),
   };
   const flatArcs = Object.values(allDoorArcs).flat();
 
-  // --- Extra padding: include wall exterior and any outward door arcs ---
+  // --- Extra padding: outer faces of present walls + any outward door arcs ---
 
-  const minX = flatArcs.reduce((m, a) => Math.min(m, a.px, a.tx, a.ex), -T);
-  const maxX = flatArcs.reduce((m, a) => Math.max(m, a.px, a.tx, a.ex), W + T);
-  const minY = flatArcs.reduce((m, a) => Math.min(m, a.py, a.ty, a.ey), -T);
-  const maxY = flatArcs.reduce((m, a) => Math.max(m, a.py, a.ty, a.ey), H + T);
+  const minX = flatArcs.reduce((m, a) => Math.min(m, a.px, a.tx, a.ex), wWall ? -T : 0);
+  const maxX = flatArcs.reduce((m, a) => Math.max(m, a.px, a.tx, a.ex), eWall ? W+T : W);
+  const minY = flatArcs.reduce((m, a) => Math.min(m, a.py, a.ty, a.ey), nWall ? -T : 0);
+  const maxY = flatArcs.reduce((m, a) => Math.max(m, a.py, a.ty, a.ey), sWall ? H+T : Math.max(E_h, Ww_h));
 
   const padLeft   = Math.ceil(Math.max(0, -minX));
   const padRight  = Math.ceil(Math.max(0, maxX - W));
   const padTop    = Math.ceil(Math.max(0, -minY));
   const padBottom = Math.ceil(Math.max(0, maxY - H));
 
-  const x0 = MARGIN + padLeft;   // interior NW corner
+  const x0 = MARGIN + padLeft;
   const y0 = MARGIN + padTop;
-  const x1 = x0 + W;             // interior NE/SE corner x
-  const y3 = y0 + H;             // interior SW/SE corner y
+  const x1 = x0 + W;
+  const y3 = y0 + H;
 
   const totalW = Math.ceil(W + padLeft + padRight + MARGIN * 2);
   const totalH = Math.ceil(H + padTop  + padBottom + MARGIN * 2);
 
   const strokeAttr = `stroke="${WALL_COLOR}" stroke-width="1" stroke-linecap="butt"`;
 
-  // --- Room interior fill ---
+  // --- Room interior fill (bounding box) ---
   const roomFillSVG = `<rect x="${x0}" y="${y0}" width="${W}" height="${H}" fill="${ROOM_FILL}"/>`;
 
-  // --- Wall fill rectangles (white, no stroke, drawn before face lines) ---
-
-  // 4 corner squares
+  // --- Corner fills: T×T squares only where two walls meet ---
   const cornerFills = [
-    `<rect x="${x0-T}" y="${y0-T}" width="${T}" height="${T}" fill="${WALL_FILL}"/>`,
-    `<rect x="${x1}"   y="${y0-T}" width="${T}" height="${T}" fill="${WALL_FILL}"/>`,
-    `<rect x="${x1}"   y="${y3}"   width="${T}" height="${T}" fill="${WALL_FILL}"/>`,
-    `<rect x="${x0-T}" y="${y3}"   width="${T}" height="${T}" fill="${WALL_FILL}"/>`,
-  ].join('\n  ');
+    hasNW ? `<rect x="${x0-T}" y="${y0-T}" width="${T}" height="${T}" fill="${WALL_FILL}"/>` : '',
+    hasNE ? `<rect x="${x1}"   y="${y0-T}" width="${T}" height="${T}" fill="${WALL_FILL}"/>` : '',
+    hasSE ? `<rect x="${x1}"   y="${y3}"   width="${T}" height="${T}" fill="${WALL_FILL}"/>` : '',
+    hasSW ? `<rect x="${x0-T}" y="${y3}"   width="${T}" height="${T}" fill="${WALL_FILL}"/>` : '',
+  ].filter(Boolean).join('\n  ');
 
-  // Wall segment fills (solid sections only, no corners)
-  function hWallFill(yTop, gaps, fromX) {
-    return subtractGaps(W, gaps).map(([a, b]) =>
+  // --- Wall segment fills ---
+  function hWallFill(yTop, gaps, fromX, wallW) {
+    return subtractGaps(wallW, gaps).map(([a, b]) =>
       `<rect x="${fromX+a}" y="${yTop}" width="${b-a}" height="${T}" fill="${WALL_FILL}"/>`
     ).join('\n  ');
   }
-  function vWallFill(xLeft, gaps, fromY) {
-    return subtractGaps(H, gaps).map(([a, b]) =>
+  function vWallFill(xLeft, gaps, fromY, wallH) {
+    return subtractGaps(wallH, gaps).map(([a, b]) =>
       `<rect x="${xLeft}" y="${fromY+a}" width="${T}" height="${b-a}" fill="${WALL_FILL}"/>`
     ).join('\n  ');
   }
 
   const wallFills = [
-    hWallFill(y0-T, northGaps, x0),
-    hWallFill(y3,   southGaps, x0),
-    vWallFill(x1,   eastGaps,  y0),
-    vWallFill(x0-T, westGaps,  y0),
+    nWall ? hWallFill(y0-T, northGaps, x0, W)              : '',
+    sWall ? hWallFill(y3,   southGaps, x0, W)              : '',
+    eWall ? vWallFill(x1,   eastGaps,  y0 + eTopY, E_h)   : '',
+    wWall ? vWallFill(x0-T, westGaps,  y0 + wTopY, Ww_h)  : '',
   ].filter(Boolean).join('\n  ');
 
   // --- Wall face lines ---
-  // Each wall: outer face (with T corner extensions), inner face (gapped), two end caps.
+  // hasLeft/hasRight (or hasTop/hasBottom): if true, extend into the corner;
+  // if false, draw a perpendicular termination cap across the wall thickness.
 
-  function hWallLines(yOuter, yInner, gaps, fromX) {
+  function hWallLines(yOuter, yInner, gaps, fromX, wallW, hasLeft, hasRight) {
     const segs = [];
-    // Outer face: always-solid corner extensions + gapped interior
-    for (const [a, b] of [[-T, 0], ...subtractGaps(W, gaps), [W, W+T]]) {
+    const leftExt  = hasLeft  ? [[-T, 0]]           : [];
+    const rightExt = hasRight ? [[wallW, wallW + T]] : [];
+    for (const [a, b] of [...leftExt, ...subtractGaps(wallW, gaps), ...rightExt]) {
       segs.push(`<line x1="${fromX+a}" y1="${yOuter}" x2="${fromX+b}" y2="${yOuter}" ${strokeAttr}/>`);
     }
-    // Inner face: gapped, interior width only (no corner extensions)
-    for (const [a, b] of subtractGaps(W, gaps)) {
+    if (!hasLeft)  segs.push(`<line x1="${fromX}"       y1="${yOuter}" x2="${fromX}"       y2="${yInner}" ${strokeAttr}/>`);
+    if (!hasRight) segs.push(`<line x1="${fromX+wallW}" y1="${yOuter}" x2="${fromX+wallW}" y2="${yInner}" ${strokeAttr}/>`);
+    for (const [a, b] of subtractGaps(wallW, gaps)) {
       segs.push(`<line x1="${fromX+a}" y1="${yInner}" x2="${fromX+b}" y2="${yInner}" ${strokeAttr}/>`);
     }
-    // Jamb lines at each opening edge (outer face to inner face)
     for (const g of gaps) {
       segs.push(`<line x1="${fromX+g.start}" y1="${yOuter}" x2="${fromX+g.start}" y2="${yInner}" ${strokeAttr}/>`);
       segs.push(`<line x1="${fromX+g.end}"   y1="${yOuter}" x2="${fromX+g.end}"   y2="${yInner}" ${strokeAttr}/>`);
@@ -182,17 +204,18 @@ function render({ title, width, depth, walls }, _layout) {
     return segs.join('\n  ');
   }
 
-  function vWallLines(xOuter, xInner, gaps, fromY) {
+  function vWallLines(xOuter, xInner, gaps, fromY, wallH, hasTop, hasBottom) {
     const segs = [];
-    // Outer face: always-solid corner extensions + gapped interior
-    for (const [a, b] of [[-T, 0], ...subtractGaps(H, gaps), [H, H+T]]) {
+    const topExt    = hasTop    ? [[-T, 0]]           : [];
+    const bottomExt = hasBottom ? [[wallH, wallH + T]] : [];
+    for (const [a, b] of [...topExt, ...subtractGaps(wallH, gaps), ...bottomExt]) {
       segs.push(`<line x1="${xOuter}" y1="${fromY+a}" x2="${xOuter}" y2="${fromY+b}" ${strokeAttr}/>`);
     }
-    // Inner face: gapped, spans interior height only (no corner extensions)
-    for (const [a, b] of subtractGaps(H, gaps)) {
+    if (!hasTop)    segs.push(`<line x1="${xOuter}" y1="${fromY}"       x2="${xInner}" y2="${fromY}"       ${strokeAttr}/>`);
+    if (!hasBottom) segs.push(`<line x1="${xOuter}" y1="${fromY+wallH}" x2="${xInner}" y2="${fromY+wallH}" ${strokeAttr}/>`);
+    for (const [a, b] of subtractGaps(wallH, gaps)) {
       segs.push(`<line x1="${xInner}" y1="${fromY+a}" x2="${xInner}" y2="${fromY+b}" ${strokeAttr}/>`);
     }
-    // Jamb lines at each opening edge (outer face to inner face)
     for (const g of gaps) {
       segs.push(`<line x1="${xOuter}" y1="${fromY+g.start}" x2="${xInner}" y2="${fromY+g.start}" ${strokeAttr}/>`);
       segs.push(`<line x1="${xOuter}" y1="${fromY+g.end}"   x2="${xInner}" y2="${fromY+g.end}"   ${strokeAttr}/>`);
@@ -201,22 +224,21 @@ function render({ title, width, depth, walls }, _layout) {
   }
 
   const wallLines = [
-    hWallLines(y0-T, y0, northGaps, x0),   // north: outer above, inner below
-    hWallLines(y3+T, y3, southGaps, x0),   // south: outer below, inner above
-    vWallLines(x1+T, x1, eastGaps,  y0),   // east:  outer right, inner left
-    vWallLines(x0-T, x0, westGaps,  y0),   // west:  outer left,  inner right
+    nWall ? hWallLines(y0-T, y0, northGaps, x0, W,    hasNW, hasNE)             : '',
+    sWall ? hWallLines(y3+T, y3, southGaps, x0, W,    hasSW, hasSE)             : '',
+    eWall ? vWallLines(x1+T, x1, eastGaps,  y0 + eTopY, E_h,  hasNE, hasSE)    : '',
+    wWall ? vWallLines(x0-T, x0, westGaps,  y0 + wTopY, Ww_h, hasNW, hasSW)    : '',
   ].filter(Boolean).join('\n  ');
 
   // --- Window symbols ---
-  // 2 parallel lines spanning the wall thickness, across the opening width.
 
   function windowSymbols(gaps, side) {
     const isH = side === 'north' || side === 'south';
     const { outer, inner, from } = {
-      north: { outer: y0-T, inner: y0,   from: x0 },
-      south: { outer: y3+T, inner: y3,   from: x0 },
-      east:  { outer: x1+T, inner: x1,   from: y0 },
-      west:  { outer: x0-T, inner: x0,   from: y0 },
+      north: { outer: y0-T, inner: y0,   from: x0          },
+      south: { outer: y3+T, inner: y3,   from: x0          },
+      east:  { outer: x1+T, inner: x1,   from: y0 + eTopY  },
+      west:  { outer: x0-T, inner: x0,   from: y0 + wTopY  },
     }[side];
 
     return gaps.filter(g => g.type === 'window').map(g => {
@@ -242,7 +264,6 @@ function render({ title, width, depth, walls }, _layout) {
   ].filter(Boolean).join('\n  ');
 
   // --- Door symbols ---
-  // Panel starts at inner face (py/px in room-relative coords), flush with gap edge.
   const DOOR_T = Math.max(3, Math.round(0.04 * scale));
 
   function doorSVG(arcs) {
@@ -287,12 +308,12 @@ function render({ title, width, depth, walls }, _layout) {
     `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${totalW} ${totalH}">`,
     `  <rect width="${totalW}" height="${totalH}" fill="#F0F0F0"/>`,
     `  ${roomFillSVG}`,
-    `  ${cornerFills}`,
-    wallFills  ? `  ${wallFills}`  : '',
+    cornerFills ? `  ${cornerFills}` : '',
+    wallFills   ? `  ${wallFills}`   : '',
     `  ${wallLines}`,
-    windowSyms ? `  ${windowSyms}` : '',
-    doorSyms   ? `  ${doorSyms}`   : '',
-    labelSVG   ? `  ${labelSVG}`   : '',
+    windowSyms  ? `  ${windowSyms}`  : '',
+    doorSyms    ? `  ${doorSyms}`    : '',
+    labelSVG    ? `  ${labelSVG}`    : '',
     `  ${dimW}`,
     `  ${dimH}`,
     `</svg>`,

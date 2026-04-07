@@ -1,24 +1,26 @@
 schema: room
 title: Living Room
 
-width: 4.96
-depth: 3.50
-
 walls:
   north:
+    length: 4.96
     openings:
       - type: door
         position: {from: left, offset: 3.95}
         width: 0.76
         swing: {direction: ccw, opens: out}
   east:
+    length: 3.50
     openings:
       - type: door
         position: {from: top, offset: 0.26}
         width: 0.89
         swing: {direction: ccw, opens: in}
   south:
+    length: 4.96
     openings:
       - type: window
         position: {from: right, offset: 1.59}
         width: 1.8
+  west:
+    length: 3.50

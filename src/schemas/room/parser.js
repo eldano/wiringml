@@ -7,15 +7,15 @@ const WALL_KEYS = ['north', 'south', 'east', 'west'];
 function parse(source) {
   const doc = yaml.load(source);
 
-  if (typeof doc.width  !== 'number') throw new Error('room: missing required field "width"');
-  if (typeof doc.depth  !== 'number') throw new Error('room: missing required field "depth"');
-
   const rawWalls = doc.walls || {};
   const walls = {};
 
   for (const side of WALL_KEYS) {
     const raw = rawWalls[side];
-    const openings = (raw && raw.openings) ? raw.openings.map(o => {
+    if (!raw) { walls[side] = null; continue; }
+    if (typeof raw.length !== 'number')
+      throw new Error(`room: wall "${side}" missing required field "length"`);
+    const openings = raw.openings ? raw.openings.map(o => {
       if (!o.type)    throw new Error(`room: opening on ${side} wall missing "type"`);
       if (!o.position || !o.position.from || typeof o.position.offset !== 'number')
         throw new Error(`room: opening on ${side} wall missing "position" (needs "from" and "offset")`);
@@ -25,13 +25,11 @@ function parse(source) {
         : null;
       return { type: o.type, position: { from: o.position.from, offset: o.position.offset }, width: o.width, swing };
     }) : [];
-    walls[side] = { openings };
+    walls[side] = { length: raw.length, openings };
   }
 
   return {
     title: doc.title || null,
-    width: doc.width,
-    depth: doc.depth,
     walls,
   };
 }

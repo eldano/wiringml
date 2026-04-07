@@ -18,7 +18,7 @@ function parse(source) {
 
   const fixtures = (doc.fixtures || []).map(f => {
     const id = Object.keys(f).find(k => f[k] === null) || null;
-    return { id, type: f.type, link: f.link || null, position: f.position };
+    return { id, type: f.type, link: f.link || null, notes: f.notes || null, position: f.position };
   });
 
   return { width, left_height, right_height, openings, fixtures };
