@@ -33,16 +33,21 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
   const x3 = MARGIN,     y3 = floorY - LH;      // top-left
 
   // Compute openings in pixel space
-  const doors = openings
-    .filter(o => o.type === 'door' || o.type === 'door_window')
-    .map(o => {
-      const dW = Math.round(o.width  * scale);
-      const dH = Math.round(o.height * scale);
-      const dX = o.position.from === 'right'
-        ? x1 - Math.round((o.position.offset + o.width) * scale)
-        : x0 + Math.round(o.position.offset * scale);
-      return { x: dX, w: dW, h: dH };
-    });
+  const DOOR_TYPES = new Set(['door', 'door_window', 'archway']);
+
+  const mapOpening = o => {
+    const dW = Math.round(o.width  * scale);
+    const dH = Math.round(o.height * scale);
+    const dX = o.position.from === 'right'
+      ? x1 - Math.round((o.position.offset + o.width) * scale)
+      : x0 + Math.round(o.position.offset * scale);
+    return { x: dX, w: dW, h: dH, type: o.type };
+  };
+
+  // All door-like openings punch a gap in the floor line.
+  const doorLike = openings.filter(o => DOOR_TYPES.has(o.type)).map(mapOpening);
+  // Only framed types get the jamb/header drawing.
+  const doors    = doorLike.filter(d => d.type !== 'archway');
 
   const windows = openings
     .filter(o => o.type === 'window')
@@ -56,10 +61,10 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
       return { x: wX, y: wY, w: wW, h: wH };
     });
 
-  // Build wall outline as a path, breaking the floor line at each door gap
+  // Build wall outline as a path, breaking the floor line at each door-like gap
   const floorSegments = [];
   let cursor = x0;
-  for (const d of doors.sort((a, b) => a.x - b.x)) {
+  for (const d of doorLike.sort((a, b) => a.x - b.x)) {
     if (d.x > cursor) floorSegments.push([cursor, d.x]);
     cursor = d.x + d.w;
   }
@@ -83,6 +88,16 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
       `  <rect x="${w.x + w.w - fw}"  y="${w.y + fw}"         width="${fw}"  height="${w.h - 2 * fw}" fill="${DOOR_FRAME_FILL}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
       // Outer stroke rect on top
       `  <rect x="${w.x}" y="${w.y}" width="${w.w}" height="${w.h}" fill="none" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+    ].join('\n');
+  }).join('\n');
+
+  // Archways: single-line opening outline (no frame fill)
+  const archwaySVG = doorLike.filter(d => d.type === 'archway').map(d => {
+    const top = floorY - d.h;
+    return [
+      `  <line x1="${d.x}"       y1="${floorY}" x2="${d.x}"       y2="${top}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+      `  <line x1="${d.x}"       y1="${top}"    x2="${d.x + d.w}" y2="${top}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
+      `  <line x1="${d.x + d.w}" y1="${top}"    x2="${d.x + d.w}" y2="${floorY}" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`,
     ].join('\n');
   }).join('\n');
 
@@ -164,6 +179,7 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
     `  <path d="${outlinePath}" fill="none" stroke="${STROKE}" stroke-width="${SW_WALL}" stroke-linejoin="miter"/>`,
     floorPath ? `  <path d="${floorPath}" fill="none" stroke="${STROKE}" stroke-width="${SW_WALL}"/>` : '',
     windowSVG,
+    archwaySVG,
     doorSVG,
     fixtureSVG,
     `</svg>`,
