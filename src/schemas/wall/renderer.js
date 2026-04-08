@@ -34,7 +34,7 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
 
   // Compute openings in pixel space
   const doors = openings
-    .filter(o => o.type === 'door')
+    .filter(o => o.type === 'door' || o.type === 'door_window')
     .map(o => {
       const dW = Math.round(o.width  * scale);
       const dH = Math.round(o.height * scale);
