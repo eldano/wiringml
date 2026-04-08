@@ -102,7 +102,34 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
     ].join('\n');
   }).join('\n');
 
+  // Fixture tooltips
+  function escapeXml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function buildTooltip(notes, fx, fy) {
+    const lines  = notes.split('\n');
+    const lineH  = 16;
+    const padX   = 8;
+    const padY   = 6;
+    const tipW   = Math.max(80, Math.ceil(Math.max(...lines.map(l => l.length)) * 6.5) + padX * 2);
+    const tipH   = lines.length * lineH + padY * 2;
+    const tx     = fx;
+    const ty     = fy - tipH - 6;
+    const tspans = lines.map((ln, i) =>
+      `<tspan x="${tx + padX}" dy="${i === 0 ? 0 : lineH}">${escapeXml(ln)}</tspan>`
+    ).join('');
+    return [
+      `<g class="wml-tip">`,
+      `  <rect x="${tx}" y="${ty}" width="${tipW}" height="${tipH}" rx="3" fill="#1A1A1A" fill-opacity="0.85"/>`,
+      `  <text x="${tx + padX}" y="${ty + padY + 11}" font-family="sans-serif" font-size="11" fill="#FFF">${tspans}</text>`,
+      `</g>`,
+    ].join('\n    ');
+  }
+
   // Fixtures
+  const hasTooltips = fixtures.some(f => f.notes);
+
   const fixtureSVG = fixtures.map(f => {
     const dims = FIXTURE_DIMS[f.type];
     if (!dims) return '';
@@ -112,16 +139,27 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
       ? x1 - Math.round((f.position.offset + dims.w) * scale)
       : x0 + Math.round(f.position.offset * scale);
     const fy = floorY - Math.round(f.position.height * scale) - fh;
-    const rect = `    <rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" fill="#F5EDD8" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`;
-    if (f.link) {
-      return `  <a href="#${f.link}" style="cursor:pointer">\n${rect}\n  </a>`;
+    const rect = `<rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" fill="#F5EDD8" stroke="${STROKE}" stroke-width="${SW_OPENING}"/>`;
+    if (f.notes) {
+      const tooltip = buildTooltip(f.notes, fx, fy);
+      const tag = f.link ? `a href="#${f.link}" style="cursor:pointer"` : 'g';
+      const closeTag = f.link ? 'a' : 'g';
+      return `  <${tag} class="wml-fix">\n    ${rect}\n    ${tooltip}\n  </${closeTag}>`;
     }
-    return rect;
+    if (f.link) {
+      return `  <a href="#${f.link}" style="cursor:pointer">\n    ${rect}\n  </a>`;
+    }
+    return `  ${rect}`;
   }).filter(Boolean).join('\n');
+
+  const styleSVG = hasTooltips
+    ? `  <style>.wml-tip{visibility:hidden;pointer-events:none}.wml-fix:hover .wml-tip{visibility:visible}</style>`
+    : '';
 
   return [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${totalW} ${totalH}">`,
+    styleSVG,
     `  <rect width="${totalW}" height="${totalH}" fill="#F5F5F5"/>`,
     `  <path d="${outlinePath}" fill="none" stroke="${STROKE}" stroke-width="${SW_WALL}" stroke-linejoin="miter"/>`,
     floorPath ? `  <path d="${floorPath}" fill="none" stroke="${STROKE}" stroke-width="${SW_WALL}"/>` : '',
