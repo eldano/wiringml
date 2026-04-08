@@ -1,0 +1,35 @@
+schema: wall
+
+dims:
+  width: 3.72
+  left_height: 2.45
+  right_height: 2.45
+
+status:
+  complete: false
+  missing:
+    - "Agregar símbolo estufa"
+    - "Agregar agujeros de luces pared"
+
+openings:
+  - door:
+    type: door
+    width: 0.79
+    height: 2.07
+    position: {from: right, offset: 0.02}
+
+fixtures:
+  - outlet_COM_E_225:
+    type: plaqueta
+    link: COM.E.225
+    position: {from: left, offset: 0.53, height: 0.36}
+
+  - outlet_COM_E_225:
+    type: plaqueta
+    link: COM.E.225
+    position: {from: right, offset: 1.35, height: 0.36}
+
+  - outlet_COM_E_90:
+    type: plaqueta
+    link: COM.E.90
+    position: {from: right, offset: 0.91, height: 1.06}
