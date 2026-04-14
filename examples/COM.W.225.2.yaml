@@ -19,15 +19,15 @@ components:
   conduit_1:
     type: conduit
     x: 60
-    y: 180
+    y: 120
   conduit_2:
     type: conduit
     x: 560
-    y: 180
+    y: 240
   plug:
     type: tipo_l
     x: 290
-    y: 260
+    y: 180
 
 wires:
   - color: white
