@@ -7,14 +7,12 @@ dims:
 
 extras:
   - type: ac_split
-    width: 1.1
-    height: 0.4
-    position: {from: right, offset: 0.60, height: 1.90}
+    width: 0.96
+    height: 0.34
+    position: {from: right, offset: 0.93, height: 2.00}
 
 status:
-  complete: false
-  missing:
-    - "Agregar símbolo del AC"
+  complete: true
 
 fixtures:
   - outlet_COM_W_225_2:
