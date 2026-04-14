@@ -1,5 +1,7 @@
 'use strict';
 
+const { renderExtra } = require('./extras');
+
 const MARGIN        = 40;    // outer SVG margin in px
 const TARGET_W      = 800;   // target drawable width in px (dims are scaled to fit)
 const STROKE        = '#111';
@@ -14,7 +16,7 @@ const FIXTURE_DIMS = {
   '3x4':    { w: 0.08, h: 0.12 },
 };
 
-function render({ width, left_height, right_height, openings = [], fixtures = [] }, _layout) {
+function render({ width, left_height, right_height, openings = [], fixtures = [], extras = [] }, _layout) {
   const scale = (TARGET_W - MARGIN * 2) / width;
 
   const W  = Math.round(width        * scale);
@@ -171,6 +173,17 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
     ? `  <style>.wml-tip{visibility:hidden;pointer-events:none}.wml-fix:hover .wml-tip{visibility:visible}</style>`
     : '';
 
+  // Extras: fixed schematic renders (ac_split, etc.)
+  const extrasSVG = extras.map(e => {
+    const ew = Math.round(e.width  * scale);
+    const eh = Math.round(e.height * scale);
+    const ex = e.position.from === 'right'
+      ? x1 - Math.round((e.position.offset + e.width) * scale)
+      : x0 + Math.round(e.position.offset * scale);
+    const ey = floorY - Math.round(e.position.height * scale) - eh;
+    return renderExtra(e.type, ex, ey, ew, eh);
+  }).join('\n');
+
   return [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${totalW} ${totalH}">`,
@@ -181,6 +194,7 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
     windowSVG,
     archwaySVG,
     doorSVG,
+    extrasSVG,
     fixtureSVG,
     `</svg>`,
   ].filter(Boolean).join('\n');

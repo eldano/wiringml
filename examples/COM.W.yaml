@@ -5,6 +5,12 @@ dims:
   left_height: 2.45
   right_height: 2.45
 
+extras:
+  - type: ac_split
+    width: 1.1
+    height: 0.4
+    position: {from: right, offset: 0.60, height: 1.90}
+
 status:
   complete: false
   missing:
