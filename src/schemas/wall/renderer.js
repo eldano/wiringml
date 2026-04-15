@@ -173,7 +173,8 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
     ? `  <style>.wml-tip{visibility:hidden;pointer-events:none}.wml-fix:hover .wml-tip{visibility:visible}</style>`
     : '';
 
-  // Extras: fixed schematic renders (ac_split, etc.)
+  // Extras: fixed schematic renders (ac_split, stove, etc.)
+  const wallCtx = { x0, x1, y3, y2 }; // wall corners for ceiling interpolation
   const extrasSVG = extras.map(e => {
     const ew = Math.round(e.width  * scale);
     const eh = Math.round(e.height * scale);
@@ -181,7 +182,7 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
       ? x1 - Math.round((e.position.offset + e.width) * scale)
       : x0 + Math.round(e.position.offset * scale);
     const ey = floorY - Math.round(e.position.height * scale) - eh;
-    return renderExtra(e.type, ex, ey, ew, eh);
+    return renderExtra(e, ex, ey, ew, eh, wallCtx, scale);
   }).join('\n');
 
   return [

@@ -21,12 +21,7 @@ function parse(source) {
     return { id, type: f.type, link: f.link || null, notes: f.notes || null, position: f.position };
   });
 
-  const extras = (doc.extras || []).map(e => ({
-    type:     e.type,
-    width:    e.width,
-    height:   e.height,
-    position: e.position,
-  }));
+  const extras = (doc.extras || []).map(e => ({ ...e }));
 
   return { width, left_height, right_height, openings, fixtures, extras };
 }

@@ -5,10 +5,17 @@ dims:
   left_height: 2.45
   right_height: 2.45
 
+extras:
+  - type: stove
+    width: 0.70
+    height: 0.92
+    lower_height: 0.40
+    chimney_width: 0.19
+    position: {from: left, offset: 1.20, height: 0}
+
 status:
   complete: false
   missing:
-    - "Agregar símbolo estufa"
     - "Agregar agujeros de luces pared"
 
 openings:
