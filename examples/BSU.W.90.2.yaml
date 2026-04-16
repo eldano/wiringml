@@ -1,0 +1,70 @@
+schema: wiring
+
+props:
+  title: BSU.W.90.2
+
+notes:
+  - "Luz del techo del baño"
+  - "Cond 1 va a la luz"
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: top, position: left}
+    conduit_2: {wall: top, position: right}
+    conduit_3: {wall: bottom, position: right}
+  cover:
+    type: modules
+    modules:
+      - closed
+      - switch-1p
+      - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 80
+    y: 20
+  conduit_2:
+    type: conduit
+    x: 560
+    y: 20
+  conduit_3:
+    type: conduit
+    x: 560
+    y: 400
+  bornera:
+    type: 2-chan
+    x: 300
+    y: 180
+  switch:
+    type: switch-1p
+    x: 300
+    y: 300
+
+wires:
+  - color: white
+    from: bornera.b.bottom
+    to: switch.right
+  - color: white
+    from: switch.left
+    to: conduit_1.bottom
+
+  - color: white
+    from: bornera.a
+    to: conduit_1.bottom
+
+  - color: white
+    from: conduit_2.bottom
+    to: bornera.a
+  - color: white
+    from: conduit_2.bottom
+    to: bornera.b
+
+  - color: white
+    from: bornera.a.bottom
+    to: conduit_3.top
+  - color: white
+    from: bornera.b.bottom
+    to: conduit_3.top
+
