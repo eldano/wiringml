@@ -18,8 +18,12 @@ openings:
 fixtures:
   - fixture_1:
     type: plaqueta
+    link: BSO.S.90.1
+    notes: "notes to be written here"
     position: {from: left, offset: 0.95, height: 1.05}
 
   - fixture_2:
     type: plaqueta
+    link: BSO.S.90.2
+    notes: "notes to be written here"
     position: {from: left, offset: 1.28, height: 1.05}
