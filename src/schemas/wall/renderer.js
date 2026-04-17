@@ -120,16 +120,22 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
   }).join('\n');
 
   // Fixture tooltips
+  // tipScale compensates for narrow walls whose tall SVG viewBox causes the browser
+  // to shrink the whole diagram — font size must grow proportionally to stay readable.
+  const scaleRef = (TARGET_W - MARGIN * 2) / Math.max(left_height, right_height);
+  const tipScale = Math.max(1, scale / scaleRef);
+
   function escapeXml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   function buildTooltip(notes, fx, fy) {
     const lines  = notes.split('\n');
-    const lineH  = 16;
-    const padX   = 8;
-    const padY   = 6;
-    const tipW   = Math.max(80, Math.ceil(Math.max(...lines.map(l => l.length)) * 6.5) + padX * 2);
+    const fSize  = Math.round(11 * tipScale);
+    const lineH  = Math.round(16 * tipScale);
+    const padX   = Math.round(8  * tipScale);
+    const padY   = Math.round(6  * tipScale);
+    const tipW   = Math.ceil(Math.max(...lines.map(l => l.length)) * 6.0 * tipScale) + padX * 2;
     const tipH   = lines.length * lineH + padY * 2;
     const tx     = fx;
     const ty     = fy - tipH - 6;
@@ -139,7 +145,7 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
     return [
       `<g class="wml-tip">`,
       `  <rect x="${tx}" y="${ty}" width="${tipW}" height="${tipH}" rx="3" fill="#1A1A1A" fill-opacity="0.85"/>`,
-      `  <text x="${tx + padX}" y="${ty + padY + 11}" font-family="sans-serif" font-size="11" fill="#FFF">${tspans}</text>`,
+      `  <text x="${tx + padX}" y="${ty + padY + fSize}" font-family="sans-serif" font-size="${fSize}" fill="#FFF">${tspans}</text>`,
       `</g>`,
     ].join('\n    ');
   }
@@ -172,7 +178,6 @@ function render({ width, left_height, right_height, openings = [], fixtures = []
   const styleSVG = hasTooltips
     ? `  <style>.wml-tip{visibility:hidden;pointer-events:none}.wml-fix:hover .wml-tip{visibility:visible}</style>`
     : '';
-
   // Extras: fixed schematic renders (ac_split, stove, etc.)
   const wallCtx = { x0, x1, y3, y2 }; // wall corners for ceiling interpolation
   const extrasSVG = extras.map(e => {
