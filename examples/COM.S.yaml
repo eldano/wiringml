@@ -6,9 +6,7 @@ dims:
   right_height: 2.45
 
 status:
-  complete: false
-  missing:
-    - "Agregar arco"
+  complete: true
 
 openings:
   - arch:

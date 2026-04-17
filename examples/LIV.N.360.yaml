@@ -3,10 +3,14 @@ schema: wiring
 props:
   title: LIV.N.360
 
+status:
+  completed: false
+  missing:
+    - Falta relevar todo porque está muy alto
+
 notes:
   - "⚠️ Sin tapa!"
-  - "⚠️ Está muy alto por lo que no fue relevado"
-  - Luz general del living. Bomba de bajo consumo blanca fría.
+  - Luz general del living.
 
 overviews:
   casing:
