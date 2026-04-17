@@ -1,0 +1,26 @@
+schema: room
+title: Bathroom
+
+status:
+  complete: false
+  missing:
+    - Adjust all dimensions (walls, door, window)
+
+walls:
+  north:
+    length: 1.47
+    openings:
+      - type: door
+        width: 0.79
+        position: {from: left, offset: 0.02}
+        swing: {direction: ccw, opens: in}
+  east:
+    length: 3.50
+    openings:
+      - type: window
+        width: 0.50
+        position: {from: top, offset: 1.80}
+  south:
+    length: 1.47
+  west:
+    length: 3.50
