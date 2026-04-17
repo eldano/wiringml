@@ -1,0 +1,23 @@
+schema: wall
+
+status:
+  complete: false
+  missing:
+    - "Fix all measurements for wall dims and fixtures"
+    - "Add outlet inside jacuzzi"
+
+dims:
+  width: 3.50
+  left_height: 2.45
+  right_height: 2.45
+
+fixtures:
+  - fixture_1:
+    link: BSU.W.90.2
+    type: plaqueta
+    position: {from: right, offset: 0.40, height: 1.05}
+
+  - fixture_2:
+    link: BSU.W.90.1
+    type: plaqueta
+    position: {from: right, offset: 0.80, height: 1.05}
