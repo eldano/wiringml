@@ -1,0 +1,25 @@
+schema: wall
+
+status:
+  complete: true
+
+dims:
+  width: 1.47
+  left_height: 2.45
+  right_height: 2.45
+
+openings:
+  - door:
+    type: door
+    width: 0.79
+    height: 2.07
+    position: {from: left, offset: 0.02}
+
+fixtures:
+  - fixture_1:
+    type: plaqueta
+    position: {from: left, offset: 0.95, height: 1.05}
+
+  - fixture_2:
+    type: plaqueta
+    position: {from: left, offset: 1.28, height: 1.05}
