@@ -1,0 +1,25 @@
+schema: room
+title: Bathroom
+
+status:
+  complete: true
+
+walls:
+  north:
+    length: 1.47
+    openings:
+      - type: window
+        width: 0.70
+        position: {from: left, offset: 0.39}
+  east:
+    length: 3.50
+  south:
+    length: 1.47
+    ref: BSO.S
+    openings:
+      - type: door
+        width: 0.79
+        position: {from: right, offset: 0.02}
+        swing: {direction: cw, opens: in}
+  west:
+    length: 3.50
