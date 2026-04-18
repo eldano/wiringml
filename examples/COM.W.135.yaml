@@ -1,0 +1,53 @@
+schema: wiring
+
+title: COM.W.135
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: left, position: center}
+    conduit_2: {wall: top, position: right}
+  cover:
+    type: modules
+    modules:
+      - closed
+      - tipo_l
+      - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 60
+    y: 180
+  conduit_2:
+    type: conduit
+    x: 320
+    y: 30
+  plug:
+    type: tipo_l
+    x: 190
+    y: 240
+
+wires:
+  - color: brown
+    from: conduit_1.right
+    to: plug.left.top
+  - color: green
+    from: conduit_1.right
+    to: plug.gnd.top
+  - color: brown
+    from: conduit_1.right
+    to: plug.right.top
+  - color: brown
+    from: plug.left.bottom
+    to: conduit_2.bottom
+  - color: green
+    from: plug.gnd.bottom
+    to: conduit_2.bottom
+  - color: brown
+    from: plug.right.bottom
+    to: conduit_2.bottom
+
+notes:
+  - cond.2 es un ducto externo y conecta el AC
+  - ⚠️ debería existir un switch porque el AC está conectado directo y no hay forma de desconectarlo
