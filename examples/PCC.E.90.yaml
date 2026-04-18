@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: PCC.E.90
+title: PCC.E.90
 
 notes:
   - "- Switch top controla 2 luces, la de la entrada bajo techo y las de afuera de la pared del living."

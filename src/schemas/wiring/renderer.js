@@ -31,7 +31,7 @@ const V_FRAC = { top:  0.2, center: 0.5, bottom: 0.8 };
  * connected to the wiring diagram on the right via dashed lines.
  */
 function render(graph, { positions, edges }) {
-  const { components, overviews, props = {}, notes = [] } = graph;
+  const { components, overviews, title, notes = [] } = graph;
 
   // --- Panel section (optional) ---
   let panelResult = null;
@@ -93,8 +93,8 @@ function render(graph, { positions, edges }) {
   }).join('\n');
 
 
-  const titleSVG = props.title
-    ? `  <text x="${MARGIN}" y="${MARGIN - 8}" font-family="sans-serif" font-size="13" font-weight="bold" fill="#444">${props.title}</text>`
+  const titleSVG = title
+    ? `  <text x="${MARGIN}" y="${MARGIN - 8}" font-family="sans-serif" font-size="13" font-weight="bold" fill="#444">${title}</text>`
     : null;
 
   return [

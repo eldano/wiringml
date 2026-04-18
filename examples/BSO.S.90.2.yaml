@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: BSO.S.90.2
+title: BSO.S.90.2
 
 notes:
   - "Tiene una llave bipolar que no está conectada a nada, la dejo para que quede tapado"

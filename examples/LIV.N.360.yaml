@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: LIV.N.360
+title: LIV.N.360
 
 status:
   completed: false

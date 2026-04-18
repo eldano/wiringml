@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: PCC.E.C
+title: PCC.E.C
 
 notes:
   - "- ⚠️ Switch corta neutro"

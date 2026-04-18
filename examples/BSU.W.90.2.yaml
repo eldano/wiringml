@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: BSU.W.90.2
+title: BSU.W.90.2
 
 notes:
   - "Luz del techo del baño"

@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: BSO.S.90.1
+title: BSO.S.90.1
 
 notes:
   - "Llave de luz del techo del baño"

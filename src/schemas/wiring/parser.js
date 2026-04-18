@@ -32,10 +32,10 @@ function parse(source) {
   }));
 
   const overviews = doc.overviews || null;
-  const props     = doc.props     || {};
+  const title     = doc.title    || null;
   const notes     = (doc.notes || []).map(String);
 
-  return { components, wires, overviews, props, notes };
+  return { components, wires, overviews, title, notes };
 }
 
 function parseEndpoint(str) {

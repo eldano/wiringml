@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: LIV.S.135
+title: LIV.S.135
 
 overviews:
   casing:

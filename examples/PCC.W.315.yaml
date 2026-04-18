@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: PCC.W.315
+title: PCC.W.315
 
 overviews:
   casing:

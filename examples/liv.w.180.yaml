@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: LIV.W.180
+title: LIV.W.180
 
 overviews:
   casing:

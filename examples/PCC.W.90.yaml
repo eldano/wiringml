@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: PCC.W.90
+title: PCC.W.90
 
 overviews:
   casing:

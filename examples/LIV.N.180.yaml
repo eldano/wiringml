@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: LIV.N.180
+title: LIV.N.180
 
 notes:
   - "⚠️ el módulo se sale para afuera al desenchufar algo"

@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: BSU.W.90.1
+title: BSU.W.90.1
 
 notes:
   - "El switch prende el jacuzzi que se conecta a traves de cond 3"

@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: COM.W.225.2
+title: COM.W.225.2
 
 overviews:
   casing:

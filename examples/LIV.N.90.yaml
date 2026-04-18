@@ -1,7 +1,6 @@
 schema: wiring
 
-props:
-  title: LIV.N.90
+title: LIV.N.90
 
 notes:
   - "El switch prende la luz del techo pero no se si la luz se conecta por el ducto 1 o 2"
