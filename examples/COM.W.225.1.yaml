@@ -1,0 +1,80 @@
+schema: wiring
+
+title: COM.W.225.1
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: left, position: center}
+    conduit_2: {wall: right, position: center}
+  cover:
+    type: modules
+    modules:
+      - tipo_l
+      - closed
+      - tipo_l
+
+notes:
+  - ⚠️ Muchos puentes
+  - ⚠️ Puente de tierra entre plugs con cable blanco
+
+components:
+  conduit_1:
+    type: conduit
+    x: 60
+    y: 180
+  conduit_2:
+    type: conduit
+    x: 560
+    y: 180
+  bornera:
+    type: 2-chan
+    x: 340
+    y: 100
+  plug_1:
+    type: tipo_l
+    x: 200
+    y: 60
+  plug_2:
+    type: tipo_l
+    x: 200
+    y: 280
+
+wires:
+  - color: white
+    from: conduit_1.right
+    to: bornera.b.bottom
+  - color: brown
+    from: conduit_1.right
+    to: bornera.a.bottom
+  - color: green
+    from: conduit_1.right
+    to: plug_2.gnd.top
+
+  - color: white
+    from: plug_2.left.top
+    to: plug_1.left.bottom
+  - color: white
+    from: plug_2.right.top
+    to: plug_1.right.bottom
+  - color: white
+    from: plug_2.gnd.top
+    to: plug_1.gnd.bottom
+
+  - color: white
+    from: plug_2.left.bottom
+    to: bornera.a.bottom
+  - color: white
+    from: plug_2.right.bottom
+    to: bornera.b.bottom
+
+  - color: brown
+    from: bornera.a.bottom
+    to: conduit_2.left
+  - color: brown
+    from: bornera.b.bottom
+    to: conduit_2.left
+
+  - color: green
+    from: plug_1.gnd.top
+    to: conduit_2.top
