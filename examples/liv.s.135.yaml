@@ -21,16 +21,16 @@ components:
     y: 20
   conduit_2:
     type: conduit
-    x: 580
+    x: 420
     y: 20
   plug_top:
     type: tipo_l
-    x: 440
-    y: 120
+    x: 220
+    y: 200
   plug_bottom:
     type: tipo_l
-    x: 440
-    y: 220
+    x: 220
+    y: 280
   bornera:
     type: 2-chan
     x: 190
@@ -40,26 +40,28 @@ wires:
   - color: white
     from: conduit_1.bottom
     to: bornera.a
+  - color: white
+    from: conduit_1.bottom
+    to: bornera.b
+  - color: green
+    from: conduit_1.bottom
+    to: plug_bottom.gnd.bottom
+
+
   - color: brown
     from: bornera.a
     to: conduit_2.bottom
   - color: brown
-    from: bornera.a
-    to: plug_top.right.top
+    from: bornera.a.bottom
+    to: plug_top.left.top
 
-  - color: white
-    from: conduit_1.bottom
-    to: bornera.b
   - color: brown
     from: bornera.b
     to: conduit_2
   - color: brown
-    from: bornera.b
-    to: plug_top.left.top
+    from: bornera.b.bottom
+    to: plug_top.right.top
 
-  - color: green
-    from: conduit_1.bottom
-    to: plug_bottom.gnd.bottom
   - color: green
     from: plug_top.gnd.top
     to: conduit_2.bottom
