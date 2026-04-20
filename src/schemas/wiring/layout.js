@@ -263,10 +263,53 @@ function buildSection(src, srcDir, sLen, tgt, tgtDir, tLen) {
 const MAX_STUB_TRIES = 24;
 
 /**
+ * The "late" stub length: extend the source stub until it is aligned with tp
+ * (the stub-adjusted target point), so sp and tp share an axis and need only
+ * one segment to connect. Falls back to minLen if tp is in the wrong direction.
+ */
+function lateStubLen(src, srcDir, tgt, tgtDir, tLen, minLen) {
+  const base = minLen ?? MIN_STUB;
+  const tp   = tgtDir ? applyStub(tgt, tgtDir, tLen) : tgt;
+  switch (srcDir) {
+    case 'right': return Math.max(base, tp.x - src.x);
+    case 'left':  return Math.max(base, src.x - tp.x);
+    case 'down':  return Math.max(base, tp.y - src.y);
+    case 'up':    return Math.max(base, src.y - tp.y);
+    default:      return base;
+  }
+}
+
+/**
+ * Returns true if two axis-aligned segments (one horizontal, one vertical)
+ * strictly cross each other (T-intersections and endpoint touches excluded).
+ */
+function segmentsCross(p1, p2, q1, q2) {
+  const h1 = p1.y === p2.y;
+  const h2 = q1.y === q2.y;
+  if (h1 === h2) return false; // parallel — overlap handled elsewhere
+
+  const [h, v] = h1 ? [[p1, p2], [q1, q2]] : [[q1, q2], [p1, p2]];
+  const hMinX = Math.min(h[0].x, h[1].x), hMaxX = Math.max(h[0].x, h[1].x);
+  const vMinY = Math.min(v[0].y, v[1].y), vMaxY = Math.max(v[0].y, v[1].y);
+  return v[0].x > hMinX && v[0].x < hMaxX && h[0].y > vMinY && h[0].y < vMaxY;
+}
+
+/** Count how many segments in pts[] cross segments already in routedSegments. */
+function countCrossings(pts, routedSegments) {
+  let count = 0;
+  for (let i = 0; i < pts.length - 1; i++) {
+    for (const [q1, q2] of routedSegments) {
+      if (segmentsCross(pts[i], pts[i + 1], q1, q2)) count++;
+    }
+  }
+  return count;
+}
+
+/**
  * Route a single wire between two absolute port positions.
- * Stubs are emitted in the port's exit direction before any turn is allowed.
- * If the resulting path would pass through another component, the stub is
- * extended by STUB_STEP until it clears all obstacles.
+ * Tries both an early-turn path (small stub, grow until clear) and a late-turn
+ * path (stub aligned with target, grow until clear), then picks whichever
+ * crosses fewer already-routed wires. Falls back to the early path on a tie.
  * Returns one ELK-compatible section: { startPoint, bendPoints, endPoint }.
  */
 function routeWire(src, srcDir, tgt, tgtDir, srcStubLen, tgtStubLen, positions, excludeIds, routedSegments) {
@@ -278,17 +321,37 @@ function routeWire(src, srcDir, tgt, tgtDir, srcStubLen, tgtStubLen, positions, 
   }
 
   const tLen = tgtStubLen ?? MIN_STUB;
-  let   sLen = srcStubLen ?? MIN_STUB;
-  let   last;
 
+  // Early-turn candidate: start with the minimum stub and grow until clear.
+  let sLenEarly    = srcStubLen ?? MIN_STUB;
+  let lastEarly;
+  let earlyCleared = false;
   for (let attempt = 0; attempt < MAX_STUB_TRIES; attempt++) {
-    const section = buildSection(src, srcDir, sLen, tgt, tgtDir, tLen);
-    last = section;
-    if (pathClear(section._pts, positions, excludeIds, routedSegments)) break;
-    sLen += STUB_STEP;
+    const section = buildSection(src, srcDir, sLenEarly, tgt, tgtDir, tLen);
+    lastEarly = section;
+    if (pathClear(section._pts, positions, excludeIds, routedSegments)) { earlyCleared = true; break; }
+    sLenEarly += STUB_STEP;
   }
 
-  const { _pts: _, ...result } = last;
+  // Late-turn candidate: start with the stub aligned to tp (stub-adjusted target) and grow until clear.
+  let sLenLate    = lateStubLen(src, srcDir, tgt, tgtDir, tLen, srcStubLen);
+  let lastLate;
+  let lateCleared = false;
+  for (let attempt = 0; attempt < MAX_STUB_TRIES; attempt++) {
+    const section = buildSection(src, srcDir, sLenLate, tgt, tgtDir, tLen);
+    lastLate = section;
+    if (pathClear(section._pts, positions, excludeIds, routedSegments)) { lateCleared = true; break; }
+    sLenLate += STUB_STEP;
+  }
+
+  // A cleared candidate always beats an uncleared one.
+  // Between two cleared candidates, pick the one with fewer crossings (early wins ties).
+  const crossEarly = countCrossings(lastEarly._pts, routedSegments);
+  const crossLate  = countCrossings(lastLate._pts,  routedSegments);
+  const useLate    = lateCleared && (!earlyCleared || crossLate < crossEarly);
+  const best       = useLate ? lastLate : lastEarly;
+
+  const { _pts: _, ...result } = best;
   return result;
 }
 
