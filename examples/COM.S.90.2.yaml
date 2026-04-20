@@ -1,0 +1,103 @@
+schema: wiring
+
+title: COM.S.90.2
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: top, position: right}
+    conduit_2: {wall: back, position: middle}
+    conduit_3: {wall: bottom, position: left}
+    conduit_4: {wall: bottom, position: right}
+  cover:
+    type: modules
+    modules:
+      - switch-1p
+      - closed
+      - switch-1p
+
+notes:
+  - Switch 1 enciende luces de techo del comedor
+  - Switch 2 controla luces de la barra
+  - ⚠️ Esta boca es controlada por 2 térmicas distintas
+  - Las tomas del comedor y las luces de la barra están en el mismo circuito
+  - Las luces del techo del comedor están en circuito independiente.
+  - Sería mejor que las luces de la barra y del comedor estén en 1 circuito y los tomas del comedor en otro
+  - cond.1 va a las luces de la barra
+  - cond.2 va a las luces del techo del comedor que están una después de la otra.
+  - cond.3 parece ser el que viene del circuito principal.
+  - cond.4 parece ser la continuación del circuito y dirigirse a los tomas de la pared comedor W
+  - ⚠️ Switch_2 parece estar cortando el neutro y no la fase
+
+components:
+  conduit_1:
+    type: conduit
+    x: 480
+    y: 30
+  conduit_2:
+    type: conduit
+    x: 270
+    y: 180
+  conduit_3:
+    type: conduit
+    x: 80
+    y: 380
+  conduit_4:
+    type: conduit
+    x: 480
+    y: 380
+  bornera:
+    type: 3-chan
+    x: 220
+    y: 320
+  switch_1:
+    type: switch-1p
+    x: 100
+    y: 130
+  switch_2:
+    type: switch-1p
+    x: 420
+    y: 240
+
+wires:
+  - color: brown
+    from: conduit_3.right
+    to: bornera.a.bottom
+  - color: green
+    from: conduit_3.right
+    to: bornera.b.bottom
+  - color: brown
+    from: conduit_3.right
+    to: bornera.c.bottom
+
+  - color: brown
+    from: bornera.a.bottom
+    to: conduit_4.left
+  - color: green
+    from: bornera.b.bottom
+    to: conduit_4.left
+  - color: brown
+    from: bornera.c.bottom
+    to: conduit_4.left
+  
+  - color: white
+    from: bornera.a
+    to: switch_2.left
+  - color: white
+    from: switch_2.right
+    to: conduit_1.bottom
+
+  - color: white
+    from: bornera.c
+    to: conduit_1.bottom
+
+  - color: white
+    from: conduit_3.top
+    to: switch_1.left
+  - color: white
+    from: switch_1.right
+    to: conduit_2.left
+
+  - color: white
+    from: conduit_3.top
+    to: conduit_2.left
