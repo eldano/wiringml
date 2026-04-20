@@ -30,9 +30,9 @@ wires:
   - color: brown
     from: conduit_1.bottom
     to: plug.left.top
-  - color: brown
-    from: conduit_1.bottom
-    to: plug.right.top
   - color: green
     from: conduit_1.bottom
     to: plug.gnd.top
+  - color: brown
+    from: conduit_1.bottom
+    to: plug.right.top

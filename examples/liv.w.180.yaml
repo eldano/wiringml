@@ -17,34 +17,34 @@ overviews:
 components:
   conduit_1:
     type: conduit
-    x: 60
+    x: 0
     y: 20
   conduit_2:
     type: conduit
-    x: 580
+    x: 360
     y: 20
   plug:
     type: tipo_l
-    x: 300
+    x: 160
     y: 120
 
 wires:
   - color: brown
-    from: conduit_1.bottom
-    to: plug.left.top
-  - color: brown
-    from: conduit_1.bottom
-    to: plug.right.top
+    from: plug.left.top
+    to: conduit_1.bottom
   - color: green
-    from: conduit_1.bottom
-    to: plug.gnd.top
-
+    from: plug.gnd.top
+    to: conduit_1.bottom
   - color: brown
-    from: plug.left.bottom
-    to: conduit_2.bottom
+    from: plug.right.top
+    to: conduit_1.bottom
+
   - color: brown
     from: plug.right.bottom
     to: conduit_2.bottom
   - color: green
     from: plug.gnd.bottom
+    to: conduit_2.bottom
+  - color: brown
+    from: plug.left.bottom
     to: conduit_2.bottom

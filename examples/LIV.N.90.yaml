@@ -3,7 +3,8 @@ schema: wiring
 title: LIV.N.90
 
 notes:
-  - "El switch prende la luz del techo pero no se si la luz se conecta por el ducto 1 o 2"
+  - "El switch prende la luz del techo."
+  - "El cable de luz va por cond 1 y hay otro par de cables que van directo sin pasar por el switch."
 
 overviews:
   casing:
@@ -59,11 +60,11 @@ wires:
     to: bornera.b
 
   - color: white
-    from: bornera.a
-    to: conduit_2.bottom
+    from: conduit_2.bottom
+    to: bornera.b
   - color: white
-    from: bornera.b
-    to: conduit_2.bottom
+    from: conduit_2.bottom
+    to: bornera.a
 
   - color: white
     from: bornera.a.bottom
