@@ -21,6 +21,8 @@ function compareNames(a, b) {
     if (pa === pb) continue;
     // Third segment (index 2) uses special ordering: C first, then numeric ascending
     if (i === 2) {
+      if (pb === '') return  1;  // b is the parent — sort it first
+      if (pa === '') return -1;  // a is the parent — sort it first
       if (pa === 'C') return -1;
       if (pb === 'C') return  1;
       const na = Number(pa), nb = Number(pb);
