@@ -1,0 +1,53 @@
+schema: wiring
+
+title: COC.E.C
+
+notes:
+  - "- Enchufe de la heladera"
+  - "- Llegan cables de un circuito al schuko"
+  - "- Los cables que hacen bypass van al circuito del microondas (COC.E.45)"
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: bottom, position: left}
+    conduit_2: {wall: right, position: top}
+  cover:
+    type: modules
+    modules:
+      - tipo_f
+      - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 80
+    y: 350
+  conduit_2:
+    type: conduit
+    x: 430
+    y: 50
+  plug:
+    type: tipo_f
+    x: 220
+    y: 160
+
+wires:
+  - color: white
+    from: conduit_1.top
+    to: plug.left.bottom
+  - color: white
+    from: conduit_1.top
+    to: plug.right.bottom
+  - color: green
+    from: conduit_1.top
+    to: plug.gnd.bottom
+  - color: white
+    from: conduit_1.top
+    to: conduit_2.bottom
+  - color: white
+    from: conduit_1.top
+    to: conduit_2.bottom
+  - color: green
+    from: plug.gnd.top
+    to: conduit_2.left
