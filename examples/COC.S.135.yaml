@@ -1,0 +1,53 @@
+schema: wiring
+
+title: COC.S.135
+
+notes:
+  - "- Enchufe del calefón"
+  - "- Tiene un módulo abierto"
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: left, position: top}
+    conduit_2: {wall: top, position: right}
+  cover:
+    type: modules
+    modules:
+      - closed
+      - closed
+      - tipo_l
+
+components:
+  conduit_1:
+    type: conduit
+    x: 60
+    y: 50
+  conduit_2:
+    type: conduit
+    x: 320
+    y: 30
+  plug:
+    type: tipo_l
+    x: 190
+    y: 220
+
+wires:
+  - color: white
+    from: conduit_1.right
+    to: plug.left.top
+  - color: white
+    from: conduit_1.right
+    to: plug.right.top
+  - color: green
+    from: conduit_1.right
+    to: plug.gnd.top
+  - color: white
+    from: plug.left.bottom
+    to: conduit_2.bottom
+  - color: white
+    from: plug.right.bottom
+    to: conduit_2.bottom
+  - color: green
+    from: plug.gnd.bottom
+    to: conduit_2.bottom
