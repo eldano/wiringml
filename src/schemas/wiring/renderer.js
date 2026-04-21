@@ -209,17 +209,27 @@ function labelPos(wall, cx, cy) {
  * Modules are stacked vertically and centred inside the panel rectangle.
  * Supported module types: 'tipo_l' (rectangle + 3 pin holes), 'closed' (blank rectangle).
  */
+// Number of standard slots a module type occupies.
+const MODULE_SLOTS = { tipo_f: 2 };
+function moduleSlots(type) { return MODULE_SLOTS[type] || 1; }
+
 function buildCoverOverview(modules, panelX, panelY, overviews, coverType) {
   const { w: panelW, h: panelH } = panelDims(overviews);
 
   let moduleSVGs = [];
   if (modules.length > 0) {
-    const stackH  = modules.length * MOD_H + (modules.length - 1) * MOD_GAP;
+    const totalSlots = modules.reduce((s, t) => s + moduleSlots(t), 0);
+    const stackH  = totalSlots * MOD_H + (totalSlots - 1) * MOD_GAP;
     const startY  = panelY + (panelH - stackH) / 2;
     const moduleX = panelX + (panelW - MOD_W) / 2;
-    moduleSVGs = modules.map((type, i) =>
-      renderModule(type, moduleX, startY + i * (MOD_H + MOD_GAP))
-    );
+    let currentY  = startY;
+    moduleSVGs = modules.map(type => {
+      const slots = moduleSlots(type);
+      const h     = slots * MOD_H + (slots - 1) * MOD_GAP;
+      const svg   = renderModule(type, moduleX, currentY, h);
+      currentY   += h + MOD_GAP;
+      return svg;
+    });
   }
 
   const fill = (modules.length > 0 || coverType === 'covered') ? '#F5EDD8' : '#555555';
@@ -237,7 +247,7 @@ function buildCoverOverview(modules, panelX, panelY, overviews, coverType) {
   };
 }
 
-function renderModule(type, x, y) {
+function renderModule(type, x, y, h = MOD_H) {
   if (type === 'switch-2p') {
     const offY = y + MOD_H * 0.72;
     const onY  = y + MOD_H * 0.72;
@@ -274,15 +284,34 @@ function renderModule(type, x, y) {
       Math.round(MOD_W * 0.75),
     ];
     const pins = pinXs.map(ox =>
-      `    <circle cx="${x + ox}" cy="${y + MOD_H / 2}" r="4" fill="#444" stroke="#222" stroke-width="1"/>`
+      `    <circle cx="${x + ox}" cy="${y + h / 2}" r="4" fill="#444" stroke="#222" stroke-width="1"/>`
     ).join('\n');
     return [
-      `    <rect x="${x}" y="${y}" width="${MOD_W}" height="${MOD_H}" fill="#F0EDE8" stroke="#444" stroke-width="1" rx="2"/>`,
+      `    <rect x="${x}" y="${y}" width="${MOD_W}" height="${h}" fill="#F0EDE8" stroke="#444" stroke-width="1" rx="2"/>`,
+      pins,
+    ].join('\n');
+  }
+  if (type === 'tipo_f') {
+    // Square outline inscribed in the module area, circle inside (~90%), 3 pin holes.
+    const side  = Math.min(MOD_W, h) - 8;
+    const sx    = x + (MOD_W - side) / 2;
+    const sy    = y + (h - side) / 2;
+    const cx    = sx + side / 2;
+    const cy    = sy + side / 2;
+    const r     = Math.round(side * 0.45); // ~90% of side/2
+    const pinXs = [Math.round(side * 0.25), Math.round(side * 0.50), Math.round(side * 0.75)];
+    const pins  = pinXs.map(ox =>
+      `    <circle cx="${sx + ox}" cy="${cy}" r="3" fill="#444" stroke="#222" stroke-width="1"/>`
+    ).join('\n');
+    return [
+      `    <rect x="${x}" y="${y}" width="${MOD_W}" height="${h}" fill="#F0EDE8" stroke="#444" stroke-width="1" rx="2"/>`,
+      `    <rect x="${sx}" y="${sy}" width="${side}" height="${side}" fill="#F0EDE8" stroke="#444" stroke-width="1" rx="2"/>`,
+      `    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#444" stroke-width="1"/>`,
       pins,
     ].join('\n');
   }
   // closed: slightly darker cream rectangle
-  return `    <rect x="${x}" y="${y}" width="${MOD_W}" height="${MOD_H}" fill="#CBBA96" stroke="#555" stroke-width="1" rx="2"/>`;
+  return `    <rect x="${x}" y="${y}" width="${MOD_W}" height="${h}" fill="#CBBA96" stroke="#555" stroke-width="1" rx="2"/>`;
 }
 
 module.exports = { render };

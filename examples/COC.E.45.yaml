@@ -1,0 +1,44 @@
+schema: wiring
+
+title: COC.E.45
+
+notes:
+  - "- Enchufe del microondas"
+  - "- !!! La tierra está desconectada"
+  - "- El switch no está conectado, era para prender el tubo que no está más"
+  - "- El ducto va hacia el ducto de la heladera, pero no conecta ahí, solo bypass"
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: bottom, position: right}
+  cover:
+    type: modules
+    modules:
+      - tipo_f
+      - switch-1p
+
+components:
+  conduit_1:
+    type: conduit
+    x: 350
+    y: 330
+  plug:
+    type: tipo_f
+    x: 190
+    y: 120
+  switch:
+    type: switch-1p
+    x: 200
+    y: 250
+
+wires:
+  - color: white
+    from: conduit_1.top
+    to: plug.left.top
+  - color: green
+    from: conduit_1.top
+    to: plug.gnd.top
+  - color: white
+    from: conduit_1.top
+    to: plug.right.top

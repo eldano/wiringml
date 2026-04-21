@@ -125,6 +125,53 @@ const COMPONENTS = {
     },
   },
 
+  tipo_f: {
+    // Square plug face (80×80). A circle (~90% of side) is centred inside,
+    // with 3 pin holes arranged horizontally across the circle centre.
+    // Ports: left/gnd/right on both top and bottom edges — same names as tipo_l.
+    width: 80,
+    height: 80,
+    ports() {
+      return {
+        'left.top':    { x: 20, y: 0  },
+        'left.bottom': { x: 20, y: 80 },
+        'gnd.top':     { x: 40, y: 0  },
+        'gnd.bottom':  { x: 40, y: 80 },
+        'right.top':   { x: 60, y: 0  },
+        'right.bottom':{ x: 60, y: 80 },
+        center:        { x: 40, y: 40 },
+      };
+    },
+    svg(x, y, _props, id) {
+      const cx   = x + 40;
+      const cy   = y + 40;
+      const r    = 36; // ~90% of half-side (80*0.9/2)
+      const pinXs = [20, 40, 60];
+
+      const holes = pinXs.map(ox =>
+        `  <circle cx="${x + ox}" cy="${cy}" r="5" fill="#444" stroke="#222" stroke-width="1"/>`
+      ).join('\n');
+
+      const topPins = pinXs.map(ox =>
+        `  <circle cx="${x + ox}" cy="${y}"      r="3" fill="#888" stroke="#555" stroke-width="1"/>`
+      ).join('\n');
+      const botPins = pinXs.map(ox =>
+        `  <circle cx="${x + ox}" cy="${y + 80}" r="3" fill="#888" stroke="#555" stroke-width="1"/>`
+      ).join('\n');
+
+      return [
+        `<g class="component tipo_f">`,
+        `  <rect x="${x}" y="${y}" width="80" height="80" fill="#F0EDE8" stroke="#444" stroke-width="1.5" rx="3"/>`,
+        `  <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#444" stroke-width="1.5"/>`,
+        holes,
+        topPins,
+        botPins,
+        `  <text x="${cx}" y="${y + 74}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#888">${id}</text>`,
+        `</g>`,
+      ].join('\n');
+    },
+  },
+
   'switch-1p': {
     // Single-pole switch. Ports: left and right on the horizontal centre axis.
     width: 60,
