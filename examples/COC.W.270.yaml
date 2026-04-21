@@ -1,0 +1,79 @@
+schema: wiring
+
+title: COC.W.270
+
+notes:
+  - "- Enchufe del lavavajillas"
+  - "- Sospecho que cond-1 va hacia la bomba. Los cables blancos que van por cond-3 llegan hasta el enchufe del horno y ahí empalman con los rojos"
+  - "- Luego los rojos vuelven por el mismo cond-3 y se van por cond-1 hacia afuera donde está la bomba"
+  - "- Sería más fácil conectar los rojos directo al schuko del lavavajillas."
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: left, position: center}
+    conduit_2: {wall: left, position: bottom}
+    conduit_3: {wall: right, position: top}
+  cover:
+    type: modules
+    modules:
+      - closed
+      - tipo_f
+
+components:
+  conduit_1:
+    type: conduit
+    x: 60
+    y: 180
+  conduit_2:
+    type: conduit
+    x: 60
+    y: 330
+  conduit_3:
+    type: conduit
+    x: 430
+    y: 30
+  bornera:
+    type: 1-chan
+    x: 260
+    y: 250
+  plug:
+    type: tipo_f
+    x: 400
+    y: 240
+
+wires:
+  - color: white
+    from: conduit_2.right
+    to: plug.left.bottom
+  - color: white
+    from: conduit_2.right
+    to: plug.right.bottom
+  - color: green
+    from: conduit_2.right
+    to: bornera.a.bottom
+  - color: green
+    from: bornera.a
+    to: plug.gnd.top
+
+  - color: green
+    from: conduit_1.right
+    to: bornera.a.left
+
+  - color: green
+    from: bornera.a
+    to: conduit_3.bottom
+
+  - color: red
+    from: conduit_1.right
+    to: conduit_3.left
+  - color: red
+    from: conduit_1.right
+    to: conduit_3.left
+
+  - color: white
+    from: conduit_2.right
+    to: conduit_3.right
+  - color: white
+    from: conduit_2.right
+    to: conduit_3.right

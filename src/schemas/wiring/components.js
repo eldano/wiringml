@@ -304,6 +304,36 @@ const COMPONENTS = {
     },
   },
 
+  '1-chan': {
+    // Single channel (A) accepting multiple wires.
+    // Ports: a on the top edge, a.bottom on the bottom edge.
+    width: 80,
+    height: 30,
+    ports() {
+      const GAP = 6;
+      return {
+        a:          { x: 40, y: 0,  spreadZone: { start: GAP, end: 80 - GAP } },
+        'a.bottom': { x: 40, y: 30, spreadZone: { start: GAP, end: 80 - GAP } },
+        center:     { x: 40, y: 15 },
+      };
+    },
+    svg(x, y, _props, id) {
+      const H       = 30;
+      const GAP     = 6;
+      const STRIP_H = 10;
+      const STRIP_W = 80 - GAP * 2;
+      const STRIP_Y = y + (H - STRIP_H) / 2;
+      return [
+        `<g class="component 1-chan">`,
+        `  <rect x="${x}" y="${y}" width="80" height="${H}" fill="#ECEFF1" stroke="#444" stroke-width="1.5" rx="2"/>`,
+        `  <rect x="${x + GAP}" y="${STRIP_Y}" width="${STRIP_W}" height="${STRIP_H}" fill="#AAA" stroke="#555" stroke-width="1" rx="2"/>`,
+        `  <text x="${x + 40}" y="${y + H - 4}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#666">A</text>`,
+        `  <text x="${x + 40}" y="${y + 8}" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#888">${id}</text>`,
+        `</g>`,
+      ].join('\n');
+    },
+  },
+
   '2-chan': {
     // 2 independent channels (A and B) accepting N wires
     // Ports: a on the top edge of channel A, b on the top edge of channel B.

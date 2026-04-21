@@ -3,10 +3,11 @@ schema: wiring
 title: COC.W.135
 
 notes:
+  - "- Toma de detrás de la cocina"
   - "- Hay 2 pares de cables a cada pin del schuko, el blanco de 2mm y el rojo de 1mm"
   - "- No se si los dos pares energizan el schuko o un par son de salida y vuelven por el mismo ducto."
   - "- Este circuito también conecta la bomba del pozo así que puede ser que los rojos vayan a la bomba aunque no está chequeado"
-  - "El diagrama de casing en realidad debería estar el schuko centrado en la plaqueta"
+  - "- El diagrama de casing en realidad debería estar el schuko centrado en la plaqueta"
 
 overviews:
   casing:
