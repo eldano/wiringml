@@ -1,0 +1,38 @@
+schema: wiring
+
+title: COC.W.90
+
+notes:
+  - "Enchufe para la campana"
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: left, position: center}
+  cover:
+    type: modules
+    modules:
+      - closed
+      - tipo_l
+      - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 60
+    y: 180
+  plug:
+    type: tipo_l
+    x: 190
+    y: 240
+
+wires:
+  - color: brown
+    from: conduit_1.right
+    to: plug.left.top
+  - color: green
+    from: conduit_1.right
+    to: plug.gnd.top
+  - color: white
+    from: conduit_1.right
+    to: plug.right.top
