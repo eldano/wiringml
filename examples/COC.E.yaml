@@ -1,0 +1,17 @@
+schema: wall
+
+dims:
+  width: 1.71
+  left_height: 2.40
+  right_height: 2.40
+
+fixtures:
+  - fixture_1:
+    type: plaqueta
+    link: COC.E.C
+    position: {from: left, offset: 0.86, height: 1.10}
+
+  - fixture_2:
+    type: plaqueta
+    link: COC.E.45
+    position: {from: right, offset: 0.15, height: 1.50}
