@@ -1,0 +1,91 @@
+schema: wiring
+
+title: COC.S.90
+
+notes:
+  - "Enchufe licuadora/jarra electrica"
+  - "Del cond-2 llega desde el calefón"
+  - "Va por el cond-1 hacia el enchufe del airfryer/tostadora/cafetera"
+  - "Va por el cond-3 hacia el enchufe de la campana"
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: left, position: bottom}
+    conduit_2: {wall: bottom, position: right}
+    conduit_3: {wall: right, position: bottom}
+  cover:
+    type: modules
+    modules:
+      - closed
+      - tipo_l
+      - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 0
+    y: 310
+  conduit_2:
+    type: conduit
+    x: 300
+    y: 360
+  conduit_3:
+    type: conduit
+    x: 460
+    y: 310
+  bornera_2:
+    type: 2-chan
+    x: 100
+    y: 220
+  bornera_1:
+    type: 1-chan
+    x: 300
+    y: 220
+  plug:
+    type: tipo_l
+    x: 240
+    y: 80
+
+wires:
+  - color: white
+    from: conduit_1.right
+    to: bornera_2.a.bottom
+  - color: brown
+    from: conduit_1.right
+    to: bornera_2.b.bottom
+
+  - color: white
+    from: conduit_2.top
+    to: bornera_2.a.bottom
+  - color: white
+    from: conduit_2.top
+    to: bornera_2.b.bottom
+
+  - color: white
+    from: bornera_2.a
+    to: plug.left.top
+  - color: white
+    from: bornera_2.b
+    to: plug.right.top
+
+  - color: white
+    from: bornera_2.a
+    to: conduit_3.top
+  - color: brown
+    from: bornera_2.b
+    to: conduit_3.top
+
+  - color: green
+    from: bornera_1.a
+    to: plug.gnd.bottom
+  - color: green
+    from: bornera_1.a.right
+    to: conduit_3.top
+  - color: green
+    from: bornera_1.a.bottom
+    to: conduit_1.top
+  - color: green
+    from: bornera_1.a.bottom
+    to: conduit_2.top
+  
