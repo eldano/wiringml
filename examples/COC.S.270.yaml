@@ -1,0 +1,52 @@
+schema: wiring
+
+title: COC.S.270
+
+notes:
+  - "Enchufe del airfryer/tostadora/cafetera"
+  - "La tierra está puenteada con cable azul/celeste, no verde"
+  - "!!! La tierra está floja al schuko"
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: right, position: bottom}
+  cover:
+    type: modules
+    modules:
+      - tipo_f
+      - tipo_l
+
+components:
+  conduit_1:
+    type: conduit
+    x: 430
+    y: 330
+  plug_f:
+    type: tipo_f
+    x: 180
+    y: 120
+  plug_l:
+    type: tipo_l
+    x: 175
+    y: 260
+
+wires:
+  - color: brown
+    from: conduit_1.top
+    to: plug_f.left.top
+  - color: white
+    from: conduit_1.top
+    to: plug_f.right.top
+  - color: green
+    from: conduit_1.left
+    to: plug_l.gnd.bottom
+  - color: cyan
+    from: plug_l.gnd.top
+    to: plug_f.gnd.bottom
+  - color: white
+    from: plug_l.left.top
+    to: plug_f.left.bottom
+  - color: cyan
+    from: plug_l.right.top
+    to: plug_f.right.bottom

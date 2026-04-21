@@ -11,6 +11,7 @@ const WIRE_COLORS = {
   brown:  '#4E342E',
   gray:   '#757575',
   grey:   '#757575',
+  cyan:   '#00ACC1',
 };
 
 // Each component definition has:
