@@ -23,7 +23,7 @@ const MOD_GAP = 10;
 
 // Where along a wall a position keyword maps to (0–1 fraction)
 const H_FRAC = { left: 0.2, center: 0.5, right: 0.8 };
-const V_FRAC = { top:  0.2, center: 0.5, bottom: 0.8 };
+const V_FRAC = { top:  0.2, center: 0.5, bottom: 0.70 };
 
 /**
  * Render graph + elkjs layout result to an SVG string.
@@ -150,9 +150,11 @@ function buildPanel(overviews) {
 
     connectorPoints[id] = { x: cx, y: cy };
 
-    // Knockout symbol: filled orange circle with hollow centre
+    // Knockout symbol: external conduits use cyan/blue, internal use orange/white
+    const isExternal  = def.external === true;
+    const outerFill = isExternal ? '#00ACC1' : '#FF8C00';
     markers.push(
-      `    <circle cx="${cx}" cy="${cy}" r="${MARKER_R}" fill="#FF8C00" stroke="#555" stroke-width="1.5"/>`,
+      `    <circle cx="${cx}" cy="${cy}" r="${MARKER_R}" fill="${outerFill}" stroke="#555" stroke-width="1.5"/>`,
       `    <circle cx="${cx}" cy="${cy}" r="${Math.round(MARKER_R * 0.45)}" fill="#E8E8E8"/>`,
     );
 

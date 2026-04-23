@@ -13,7 +13,7 @@ overviews:
     type: 3x4
     conduit_1: {wall: bottom, position: left}
     conduit_2: {wall: right, position: top}
-    conduit_3: {wall: left, position: bottom}
+    conduit_3: {wall: left, position: bottom, external: true}
   cover:
     type: modules
     modules:
