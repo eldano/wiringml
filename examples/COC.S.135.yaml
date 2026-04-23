@@ -4,7 +4,6 @@ title: COC.S.135
 
 notes:
   - "- Enchufe del calefón"
-  - "- Tiene un módulo abierto"
 
 overviews:
   casing:
@@ -14,40 +13,54 @@ overviews:
   cover:
     type: modules
     modules:
+      - tipo_f
       - closed
-      - closed
-      - tipo_l
 
 components:
   conduit_1:
     type: conduit
-    x: 60
+    x: 0
     y: 50
   conduit_2:
     type: conduit
     x: 320
     y: 30
+  bornera:
+    type: 3-chan
+    x: 150
+    y: 200
   plug:
-    type: tipo_l
+    type: tipo_f
     x: 190
-    y: 220
+    y: 300
 
 wires:
   - color: white
     from: conduit_1.right
+    to: bornera.c
+  - color: green
+    from: conduit_1.right
+    to: bornera.b
+  - color: white
+    from: conduit_1.right
+    to: bornera.a
+
+  - color: white
+    from: bornera.c
+    to: conduit_2.bottom
+  - color: green
+    from: bornera.b
+    to: conduit_2.bottom
+  - color: white
+    from: bornera.a
+    to: conduit_2.bottom
+
+  - color: red
+    from: bornera.a.bottom
     to: plug.left.top
-  - color: white
-    from: conduit_1.right
-    to: plug.right.top
   - color: green
-    from: conduit_1.right
+    from: bornera.b.bottom
     to: plug.gnd.top
-  - color: white
-    from: plug.left.bottom
-    to: conduit_2.bottom
-  - color: white
-    from: plug.right.bottom
-    to: conduit_2.bottom
-  - color: green
-    from: plug.gnd.bottom
-    to: conduit_2.bottom
+  - color: blue
+    from: bornera.c.bottom
+    to: plug.right.top
