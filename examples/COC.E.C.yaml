@@ -3,20 +3,22 @@ schema: wiring
 title: COC.E.C
 
 notes:
-  - "- Enchufe de la heladera"
-  - "- Llegan cables de un circuito al schuko"
-  - "- Los cables que hacen bypass van al circuito del microondas (COC.E.45)"
+  - "- Enchufe de la heladera (nuevo horno/micro)"
+  - "- Llegan cables de dos circuitos a cada schuko"
+  - "- !!! Arriba debe ir el micro y abajo el horno. El de arriba tiene un empalme con un toma externo para heladera"
+  - "- Cond.3 es externo, no hay ducto"
 
 overviews:
   casing:
     type: 3x4
     conduit_1: {wall: bottom, position: left}
     conduit_2: {wall: right, position: top}
+    conduit_3: {wall: left, position: bottom}
   cover:
     type: modules
     modules:
       - tipo_f
-      - closed
+      - tipo_f
 
 components:
   conduit_1:
@@ -26,28 +28,64 @@ components:
   conduit_2:
     type: conduit
     x: 430
-    y: 50
-  plug:
+    y: 20
+  conduit_3:
+    type: conduit
+    x: 0
+    y: 240
+  bornera:
+    type: 3-chan
+    x: 140
+    y: 150
+  plug_micro:
     type: tipo_f
-    x: 220
-    y: 160
+    x: 300
+    y: 20
+  plug_horno:
+    type: tipo_f
+    x: 300
+    y: 230
 
 wires:
   - color: white
     from: conduit_1.top
-    to: plug.left.bottom
+    to: plug_horno.right.bottom
   - color: white
     from: conduit_1.top
-    to: plug.right.bottom
+    to: plug_horno.left.bottom
+
+  - color: white
+    from: conduit_1.top
+    to: bornera.a.bottom
   - color: green
-    from: conduit_1.top
-    to: plug.gnd.bottom
-  - color: white
-    from: conduit_1.top
-    to: conduit_2.bottom
-  - color: white
-    from: conduit_1.top
-    to: conduit_2.bottom
+    from: conduit_1.right
+    to: bornera.b.bottom
+
   - color: green
-    from: plug.gnd.top
-    to: conduit_2.left
+    from: bornera.b.bottom
+    to: plug_horno.gnd.top
+
+  - color: green
+    from: bornera.b
+    to: plug_micro.gnd.bottom
+
+  - color: green
+    from: bornera.b
+    to: conduit_3.top
+
+  - color: white
+    from: bornera.a.bottom
+    to: conduit_3.top
+  - color: white
+    from: bornera.c.bottom
+    to: conduit_3.top
+  - color: white
+    from: conduit_1.right
+    to: bornera.c.bottom
+
+  - color: blue
+    from: bornera.a
+    to: plug_micro.left.bottom
+  - color: red
+    from: bornera.c
+    to: plug_micro.right.bottom
