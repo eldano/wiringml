@@ -24,8 +24,15 @@ openings:
     position: {from: left, offset: 0.04, height: 1.17}
 
 fixtures:
-  - outlet_temporal:
+  - outlet_horno:
     type: plaqueta
-    link: LIV.E.135
-    notes: "notes to be written here"
+    link: COC.W.135
     position: {from: right, offset: 1.25, height: 0.36}
+  - outlet_lavavajillas:
+    type: plaqueta
+    link: COC.W.225
+    position: {from: left, offset: 1.0, height: 0.36}
+  - outlet_campana:
+    type: plaqueta
+    link: COC.W.90
+    position: {from: right, offset: 1.25, height: 1.20}
