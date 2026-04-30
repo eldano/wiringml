@@ -44,6 +44,28 @@ const COMPONENTS = {
     },
   },
 
+  conduit_ext: {
+    width: 60,
+    height: 40,
+    ports() {
+      return {
+        center: { x: 30, y: 20 },
+        left:   { x: 0,  y: 20 },
+        right:  { x: 60, y: 20 },
+        top:    { x: 30, y: 0  },
+        bottom: { x: 30, y: 40 },
+      };
+    },
+    svg(x, y, _props, id) {
+      return [
+        `<g class="component conduit_ext">`,
+        `  <rect x="${x}" y="${y}" width="60" height="40" fill="#00ACC1" stroke="#444" stroke-width="1.5" rx="3"/>`,
+        `  <text x="${x + 30}" y="${y + 25}" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#222">${id}</text>`,
+        `</g>`,
+      ].join('\n');
+    },
+  },
+
   terminal_block: {
     width(props) { return Math.max(80, (props.ports || 2) * 25); },
     height: 50,

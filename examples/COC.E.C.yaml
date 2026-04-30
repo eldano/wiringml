@@ -6,7 +6,8 @@ notes:
   - "- Enchufe de la heladera (nuevo horno/micro)"
   - "- Llegan cables de dos circuitos a cada schuko"
   - "- !!! Arriba debe ir el micro y abajo el horno. El de arriba tiene un empalme con un toma externo para heladera"
-  - "- Cond.3 es externo, no hay ducto"
+  - "- Cond.3 es externo, el ducto va por fuera de la pared"
+  - "- El ducto Cond.3 conecta un toma schuko externo"
 
 overviews:
   casing:
@@ -30,7 +31,7 @@ components:
     x: 430
     y: 20
   conduit_3:
-    type: conduit
+    type: conduit_ext
     x: 0
     y: 240
   bornera:
