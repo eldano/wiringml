@@ -3,9 +3,8 @@ schema: wiring
 title: COC.E.45
 
 notes:
-  - "- El ducto va hacia el ducto de la heladera (nuevo horno+micro)"
   - "No hay cables, quedó anulado"
-  - "!!! Falta tapa ciega"
+  - "- El ducto va hacia el ducto de la heladera (nuevo horno+micro)"
 
 overviews:
   casing:
