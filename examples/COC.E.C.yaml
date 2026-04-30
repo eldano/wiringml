@@ -3,11 +3,9 @@ schema: wiring
 title: COC.E.C
 
 notes:
-  - "- Enchufe de la heladera (nuevo horno/micro)"
-  - "- Llegan cables de dos circuitos a cada schuko"
-  - "- !!! Arriba debe ir el micro y abajo el horno. El de arriba tiene un empalme con un toma externo para heladera"
-  - "- Cond.3 es externo, el ducto va por fuera de la pared"
-  - "- El ducto Cond.3 conecta un toma schuko externo"
+  - "- IMPORTANTE! Arriba debe ir el micro y abajo el horno. El de arriba tiene un empalme con un toma externo para heladera."
+  - "- Llegan cables de dos circuitos (cada uno con su térmica) a cada schuko"
+  - "- Cond.3 es externo, el ducto va por fuera de la pared y conecta en el mueble de la heladera."
 
 overviews:
   casing:
