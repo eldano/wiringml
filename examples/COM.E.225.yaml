@@ -1,0 +1,38 @@
+schema: wiring
+
+title: COM.E.225
+
+notes:
+  - "⚠️ Del toma salen 3 cables cortos, pelados, electrificados"
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: back, position: center}
+  cover:
+    type: modules
+    modules:
+      - closed
+      - tipo_l
+      - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 120
+    y: 150
+  plug:
+    type: tipo_l
+    x: 275
+    y: 150
+
+wires:
+  - color: brown
+    from: conduit_1.top
+    to: plug.left.top
+  - color: green
+    from: conduit_1.top
+    to: plug.gnd.top
+  - color: brown
+    from: conduit_1.top
+    to: plug.right.top
