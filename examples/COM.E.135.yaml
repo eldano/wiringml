@@ -1,0 +1,53 @@
+schema: wiring
+
+title: COM.E.135
+
+notes:
+  - "Cond.1 llega desde el tablero pasando por el ducto del baño"
+  - "Cond.2 va hacia el enchufe de la misma pared, más cerca de la ventana"
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: back, position: top}
+    conduit_2: {wall: back, position: center}
+  cover:
+    type: modules
+    modules:
+      - closed
+      - tipo_l
+      - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 190
+    y: 40
+  conduit_2:
+    type: conduit
+    x: 190
+    y: 320
+  plug:
+    type: tipo_l
+    x: 175
+    y: 180
+
+wires:
+  - color: brown
+    from: conduit_1.bottom
+    to: plug.left.top
+  - color: green
+    from: conduit_1.bottom
+    to: plug.gnd.top
+  - color: brown
+    from: conduit_1.bottom
+    to: plug.right.top
+  - color: brown
+    from: plug.left.bottom
+    to: conduit_2.top
+  - color: green
+    from: plug.gnd.bottom
+    to: conduit_2.top
+  - color: brown
+    from: plug.right.bottom
+    to: conduit_2.top

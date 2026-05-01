@@ -31,9 +31,9 @@ fixtures:
     link: COM.E.225
     position: {from: left, offset: 0.53, height: 0.36}
 
-  - outlet_COM_E_225:
+  - outlet_COM_E_135:
     type: plaqueta
-    link: COM.E.225
+    link: COM.E.135
     position: {from: right, offset: 1.35, height: 0.36}
 
   - outlet_COM_E_90:
