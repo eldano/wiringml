@@ -146,7 +146,8 @@ function render({ title, walls }, _layout) {
   const x1 = x0 + W;
   const y3 = y0 + H;
 
-  const totalW = Math.ceil(W + padLeft + padRight + MARGIN * 2);
+  const COMPASS_PAD = 60;  // extra space reserved for the compass rose
+  const totalW = Math.ceil(W + padLeft + padRight + MARGIN * 2 + COMPASS_PAD);
   const totalH = Math.ceil(H + padTop  + padBottom + MARGIN * 2);
 
   const strokeAttr = `stroke="${WALL_COLOR}" stroke-width="1" stroke-linecap="butt"`;
@@ -295,6 +296,28 @@ function render({ title, walls }, _layout) {
 
   const doorSyms = Object.values(allDoorArcs).map(doorSVG).filter(Boolean).join('\n  ');
 
+  // --- Compass rose ---
+  function compassRose(cx, cy) {
+    const R   = 16;  // circle radius
+    const ext = 5;   // how far lines extend beyond the circle
+    const lbl = 8;   // label offset from line end
+    const textAttr = `font-family="sans-serif" font-size="10" font-weight="bold" fill="#555"`;
+    return [
+      `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#999" stroke-width="1"/>`,
+      // N–S line
+      `<line x1="${cx}" y1="${cy - R - ext}" x2="${cx}" y2="${cy + R + ext}" stroke="#999" stroke-width="1"/>`,
+      // E–W line
+      `<line x1="${cx - R - ext}" y1="${cy}" x2="${cx + R + ext}" y2="${cy}" stroke="#999" stroke-width="1"/>`,
+      // Cardinal labels
+      `<text x="${cx}"        y="${cy - R - ext - lbl + 4}" text-anchor="middle"  ${textAttr}>N</text>`,
+      `<text x="${cx}"        y="${cy + R + ext + lbl}"     text-anchor="middle"  ${textAttr}>S</text>`,
+      `<text x="${cx + R + ext + lbl}" y="${cy + 4}"        text-anchor="start"   ${textAttr}>E</text>`,
+      `<text x="${cx - R - ext - lbl}" y="${cy + 4}"        text-anchor="end"     ${textAttr}>W</text>`,
+    ].join('\n  ');
+  }
+
+  const compassSVG = compassRose(totalW - COMPASS_PAD / 2 - 10, MARGIN);
+
   // --- Labels ---
   const labelSVG = title
     ? `<text x="${x0 + W/2}" y="${y0 + H/2}" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="16" fill="#777">${title}</text>`
@@ -316,6 +339,7 @@ function render({ title, walls }, _layout) {
     labelSVG    ? `  ${labelSVG}`    : '',
     `  ${dimW}`,
     `  ${dimH}`,
+    `  ${compassSVG}`,
     `</svg>`,
   ].filter(Boolean).join('\n');
 }
