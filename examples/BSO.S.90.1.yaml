@@ -4,6 +4,9 @@ title: BSO.S.90.1
 
 notes:
   - "Llave de luz del techo del baño"
+  - "Cond.2 llega desde el tablero."
+  - "Cond.1 lleva el neutro a la luz del techo y la fase a través del switch también a la luz."
+  - "Cond.3 va hacia las luces de la pared del comedor de detrás de la estufa."
   - "El cable naranja es en realidad blanco y chato, pienso que es el sensor del comedor"
 
 overviews:

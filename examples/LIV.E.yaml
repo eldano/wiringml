@@ -8,7 +8,7 @@ dims:
 status:
   complete: false
   missing:
-    - "Agregar distancias de plaqueta de detrás del rack"
+    - "Agregar distancias de plaqueta"
 
 openings:
   - door:

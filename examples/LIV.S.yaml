@@ -3,8 +3,7 @@ schema: wall
 status:
   complete: false
   missing:
-    - "⚠️ Medir la ventana correctamente y la distancia del outlet"
-    - "Cambiar 'dims' por 'main' para poder representar la pared principal y luego otras extensiones como las columnas de piedra"
+    - "Medir la ventana correctamente y la distancia del outlet"
 
 dims:
   width: 4.96
