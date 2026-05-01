@@ -1,0 +1,57 @@
+schema: wiring
+
+title: COM.E.90
+
+notes:
+  - "Switch para las luces de la pared de la estufa."
+  - "Cond.2 llega desde la pared del baño trayendo fase y neutro."
+  - "La fase está cortada por el switch y se va por cond.1 hacia las bocas para las luces en la pared."
+  - "El neutro solo se conecta a una bornera y sigue por cond.1"
+  - "El cable naranja (no es color real) es el cable que va hacia el sensor de la alarma en la pared."
+
+overviews:
+  casing:
+    type: 3x4
+    conduit_1: {wall: back, position: top}
+    conduit_2: {wall: back, position: bottom}
+  cover:
+    type: modules
+    modules:
+      - closed
+      - switch-1p
+      - closed
+
+components:
+  conduit_1:
+    type: conduit
+    x: 190
+    y: 40
+  conduit_2:
+    type: conduit
+    x: 190
+    y: 220
+  switch:
+    type: switch-1p
+    x: 80
+    y: 120
+  bornera:
+    type: 1-chan
+    x: 320
+    y: 120
+
+wires:
+  - color: white
+    from: conduit_1.bottom
+    to: switch.left
+  - color: white
+    from: switch.right
+    to: conduit_2.top
+  - color: white
+    from: conduit_1.bottom
+    to: bornera.a
+  - color: white
+    from: bornera.a.bottom
+    to: conduit_2.top
+  - color: orange
+    from: conduit_1.bottom
+    to: conduit_2.top
